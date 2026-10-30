@@ -122,7 +122,7 @@ describe("analyzeWithClaude", () => {
     expect(req.system[0]).toMatchObject({ type: "text", cache_control: { type: "ephemeral" } });
     expect(req.system[0].text).toContain("REGZ-24-APR");
     expect(req.output_config.format).toMatchObject({ type: "json_schema" });
-    expect(req.output_config.effort).toBe("medium");
+    expect(req.output_config.effort).toBe("low");
     expect(req.messages).toHaveLength(1);
     expect(req.messages[0].role).toBe("user");
     const text = req.messages[0].content.at(-1).text as string;
@@ -132,17 +132,17 @@ describe("analyzeWithClaude", () => {
 
   it("honors ANTHROPIC_MODEL and ANTHROPIC_EFFORT, ignoring invalid effort", async () => {
     process.env.ANTHROPIC_MODEL = "claude-test-model";
-    process.env.ANTHROPIC_EFFORT = "low";
+    process.env.ANTHROPIC_EFFORT = "high";
     const a = fakeClient(ok([]));
     await analyzeWithClaude(ctx, rules, facts, { client: a.client });
     const req = (a.parse.mock.calls[0] as unknown as [Record<string, any>])[0];
     expect(req.model).toBe("claude-test-model");
-    expect(req.output_config.effort).toBe("low");
+    expect(req.output_config.effort).toBe("high");
 
     process.env.ANTHROPIC_EFFORT = "bogus";
     const b = fakeClient(ok([]));
     await analyzeWithClaude(ctx, rules, facts, { client: b.client });
-    expect((b.parse.mock.calls[0] as unknown as [Record<string, any>])[0].output_config.effort).toBe("medium");
+    expect((b.parse.mock.calls[0] as unknown as [Record<string, any>])[0].output_config.effort).toBe("low");
   });
 
   it("puts an image block first in the user content", async () => {
