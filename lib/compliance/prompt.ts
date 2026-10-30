@@ -2,7 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import type { AssetContext, ProductFacts, RuleDef } from "./types";
 
 /** Bump when the instructions change so cached results keyed on the prompt can be invalidated. */
-export const PROMPT_VERSION = "2026-10-4";
+export const PROMPT_VERSION = "2026-10-5";
 
 export type ImageMediaType = "image/png" | "image/jpeg" | "image/webp" | "image/gif";
 export type FileInfo = { mediaType: ImageMediaType | "application/pdf"; base64: string };

@@ -17,7 +17,8 @@ export function verdictSentence(findings: { severity: Severity }[]): string {
 
 export function describeOnly(modelSummary: string | null | undefined): string {
   if (!modelSummary) return "";
-  const sentences = modelSummary.match(/[^.!?]+[.!?]+(?:\s|$)|[^.!?]+$/g) ?? [];
+  // Split only where a terminator is followed by whitespace, so decimals (8.99%) and U.S. stay intact.
+  const sentences = modelSummary.trim().split(/(?<=[.!?])\s+(?=["'“(A-Z0-9])/);
   return sentences
     .map((s) => s.trim())
     .filter((s) => s && !VERDICT.test(s))

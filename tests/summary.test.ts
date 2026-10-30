@@ -20,4 +20,10 @@ describe("summary verdict always agrees with the findings", () => {
     expect(describeOnly("A blog post about card rewards. The main concerns are the guarantee and missing disclosure.")).toBe("A blog post about card rewards.");
     expect(describeOnly(null)).toBe("");
   });
+
+  it("keeps decimals, percentages and abbreviations intact (regression)", () => {
+    const model = "A personal loan ad for U.S. residents offering rates from 8.99% to 35.99% APR. It notes that approval and terms depend on credit.";
+    expect(describeOnly(model)).toBe(model);
+    expect(composeSummary([{ severity: "medium" }], model)).toBe(`1 issue found (1 medium severity). ${model}`);
+  });
 });
