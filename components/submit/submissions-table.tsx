@@ -1,3 +1,4 @@
+import { ClickableRow } from "@/components/ui/clickable-row";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import type { ReactNode } from "react";
@@ -132,11 +133,11 @@ export function SubmissionsTable({ rows, staff, submitterSide, now }: Props) {
           </thead>
           <tbody className="divide-y divide-border">
             {rows.map((s) => (
-              <tr key={s.id} className="relative align-top hover:bg-surface-muted/60">
+              <ClickableRow key={s.id} href={`/submissions/${s.id}`} className="align-top hover:bg-surface-muted/60">
                 <td className="max-w-sm px-4 py-3">
                   <Link
                     href={`/submissions/${s.id}`}
-                    className="text-sm font-medium text-foreground after:absolute after:inset-0 hover:text-accent"
+                    className="text-sm font-medium text-foreground hover:text-accent"
                   >
                     <span className="mr-2 font-mono text-xs font-medium text-muted">{s.code}</span>
                     {s.title}
@@ -166,7 +167,7 @@ export function SubmissionsTable({ rows, staff, submitterSide, now }: Props) {
                 <td className="whitespace-nowrap px-4 py-3">
                   <Submitted s={s} now={now} />
                 </td>
-              </tr>
+              </ClickableRow>
             ))}
           </tbody>
         </table>

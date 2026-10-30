@@ -1,3 +1,4 @@
+import { ClickableRow } from "@/components/ui/clickable-row";
 import Link from "next/link";
 import { Zap } from "lucide-react";
 import { Badge, StatusBadge, type BadgeVariant } from "@/components/ui/badge";
@@ -27,7 +28,8 @@ function Row({ s, now }: { s: SubmissionSummary; now: Date }) {
   const launch = launchLabel(s, now);
 
   return (
-    <tr
+    <ClickableRow
+      href={`/submissions/${s.id}`}
       data-testid="queue-row"
       className="relative mb-3 block rounded-lg border border-border bg-surface p-4 shadow-card transition-colors hover:bg-surface-muted/60 focus-within:bg-surface-muted/60 md:mb-0 md:table-row md:rounded-none md:border-0 md:border-b md:p-0 md:shadow-none"
     >
@@ -81,7 +83,7 @@ function Row({ s, now }: { s: SubmissionSummary; now: Date }) {
         </div>
         <Link
           href={`/submissions/${s.id}`}
-          className="font-medium text-foreground hover:text-accent hover:underline after:absolute after:inset-0 after:content-[''] focus-visible:after:rounded-lg"
+          className="font-medium text-foreground hover:text-accent hover:underline after:absolute after:inset-0 after:content-[''] focus-visible:after:rounded-lg md:after:hidden"
         >
           {s.title}
         </Link>
@@ -138,7 +140,7 @@ function Row({ s, now }: { s: SubmissionSummary; now: Date }) {
         <Label>Submitted</Label>
         <span title={formatAbsolute(s.submittedAt)}>{relativeTime(s.submittedAt, now)}</span>
       </td>
-    </tr>
+    </ClickableRow>
   );
 }
 
