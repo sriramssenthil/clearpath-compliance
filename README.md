@@ -64,7 +64,7 @@ Review runs on email and a spreadsheet, and the compliance team cannot keep up w
 - *Claude* reads the asset as a whole for what depends on meaning: implied guarantees, whether triggering terms need extra disclosures, misleading comparisons, language that could discourage applicants.
 - Rules that only ask "is this disclosure present?" are decided by code alone. In an early eval Claude marked the NMLS ID and unsubscribe link as missing on a clean email where they were present; a regex verifies presence exactly, so the model isn't asked.
 
-**The AI only adds flags.** The output schema has no field that can approve, clear or change anything. The recommendation ("likely to need changes") is computed in code from the findings. Approval needs a human, and the service refuses to approve while a high-severity finding is open or accepted.
+**The AI only adds flags.** The output schema has no field that can approve, clear or change anything. The recommendation ("likely to need changes") is computed in code from the findings. Approval needs a human. Approving over a high-severity finding that is still open or accepted requires a written justification, which is recorded on each of those findings and in the audit trail.
 
 **All model output is untrusted.** Every Claude finding must use a rule that applies to the asset and quote text that really exists in it (exact match, then normalised, then a strict fuzzy match). Findings that fail are discarded and counted (9 to 10 per 24-case eval run). Submitted text is wrapped in `<submission>` tags and declared to be data, and text that tries to instruct the reviewer is itself a high-severity finding (`SEC-INJECTION`).
 

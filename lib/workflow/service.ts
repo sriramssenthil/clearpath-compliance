@@ -440,7 +440,18 @@ export async function addReviewerFinding(
   ]);
 }
 
-export async function decide(actor: Actor, submissionId: number, input: { outcome: Outcome; note?: string | null }) {
+export const MIN_OVERRIDE_REASON = 10;
+
+/**
+ * Records a reviewer decision. Approving over high-severity findings that are still open or accepted
+ * requires an explicit, written override: those findings are dismissed with the justification, and
+ * every one of them gets its own audit entry, in the same batch as the approval.
+ */
+export async function decide(
+  actor: Actor,
+  submissionId: number,
+  input: { outcome: Outcome; note?: string | null; overrideReason?: string | null },
+) {
   requireReviewer(actor);
   const sub = await loadSubmission(submissionId);
   if (!canDecideFrom(sub.status)) throw new WorkflowError("This submission is no longer under review.", "conflict");
@@ -448,13 +459,19 @@ export async function decide(actor: Actor, submissionId: number, input: { outcom
   const findings = await db.select().from(tables.findings).where(eq(tables.findings.versionId, version.id));
   const note = input.note?.trim() || null;
 
+  const overrideReason = input.overrideReason?.trim() || null;
+  const blocking = findings.filter((f) => f.severity === "high" && (f.status === "open" || f.status === "accepted"));
+  let overridden: typeof blocking = [];
   if (input.outcome === "approved") {
     const blockers = approvalBlockers(findings);
     if (blockers > 0) {
-      throw new WorkflowError(
-        `${blockers} high-severity finding${blockers === 1 ? " is" : "s are"} still open or accepted. Dismiss ${blockers === 1 ? "it" : "them"} with a reason, or request changes instead of approving.`,
-        "conflict",
-      );
+      if (!overrideReason || overrideReason.length < MIN_OVERRIDE_REASON) {
+        throw new WorkflowError(
+          `${blockers} high-severity finding${blockers === 1 ? " is" : "s are"} still open or accepted. Dismiss ${blockers === 1 ? "it" : "them"} with a reason, request changes, or approve with a written override (at least ${MIN_OVERRIDE_REASON} characters).`,
+          "conflict",
+        );
+      }
+      overridden = blocking;
     }
   }
   const accepted = findings.filter((f) => f.status === "accepted");
@@ -477,15 +494,31 @@ export async function decide(actor: Actor, submissionId: number, input: { outcom
 
   const now = new Date();
   const audit = input.outcome === "approved" ? AUDIT.approved : input.outcome === "rejected" ? AUDIT.rejected : AUDIT.changesRequested;
+  const overrideNote = overridden.length ? `Approved over ${overridden.length} high-severity finding${overridden.length === 1 ? "" : "s"}. Justification: ${overrideReason}` : null;
+  const decisionNote = [note, overrideNote].filter(Boolean).join("\n\n") || null;
   await runBatch([
-    db.insert(tables.decisions).values({ submissionId: sub.id, versionId: version.id, reviewerId: actor.id, outcome: input.outcome, note, feedbackDraft, createdAt: now }),
+    ...(overridden.length
+      ? [
+          db.update(tables.findings)
+            .set({ status: "dismissed", dismissReason: `Overridden at approval: ${overrideReason}`, actedBy: actor.id, actedAt: now })
+            .where(inArray(tables.findings.id, overridden.map((f) => f.id))),
+          db.insert(tables.auditEvents).values(
+            overridden.map((f, i) => ({
+              submissionId: sub.id, actorId: actor.id, action: AUDIT.findingDismissed,
+              details: { findingId: f.id, ruleCode: f.ruleCode, reason: `Overridden at approval: ${overrideReason}`, override: true, versionNumber: version.number },
+              createdAt: new Date(now.getTime() - overridden.length + i),
+            })),
+          ),
+        ]
+      : []),
+    db.insert(tables.decisions).values({ submissionId: sub.id, versionId: version.id, reviewerId: actor.id, outcome: input.outcome, note: decisionNote, feedbackDraft, createdAt: now }),
     db.update(tables.submissions).set({
       status: input.outcome, assigneeId: sub.assigneeId ?? actor.id, updatedAt: now,
       decidedAt: input.outcome === "changes_requested" ? null : now,
     }).where(eq(tables.submissions.id, sub.id)),
     db.insert(tables.auditEvents).values({
       submissionId: sub.id, actorId: actor.id, action: audit,
-      details: { versionNumber: version.number, acceptedFindings: accepted.length, note }, createdAt: now,
+      details: { versionNumber: version.number, acceptedFindings: accepted.length, note: decisionNote, ...(overridden.length ? { overriddenFindings: overridden.length } : {}) }, createdAt: now,
     }),
   ]);
   return { feedbackDraft };

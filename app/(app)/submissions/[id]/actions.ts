@@ -38,7 +38,7 @@ export async function addReviewerFindingAction(
 
 export async function decideAction(
   submissionId: number,
-  input: { outcome: Outcome; note?: string | null },
+  input: { outcome: Outcome; note?: string | null; overrideReason?: string | null },
 ): Promise<ActionResult<{ feedbackDraft: string | null }>> {
   if (!validId(submissionId)) return bad("Invalid request.");
   const actor = await currentActor();

@@ -37,6 +37,7 @@ const OUTCOME_VERB: Record<Outcome, string> = { approved: "Approve", changes_req
 
 export function DecisionPanel(p: Props) {
   const [note, setNote] = useState("");
+  const [override, setOverride] = useState("");
   const [confirming, setConfirming] = useState<Outcome | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState<{ outcome: Outcome; draft: string | null } | null>(null);
@@ -88,14 +89,15 @@ export function DecisionPanel(p: Props) {
   const open = p.latestFindings.filter((f) => f.status === "open").length;
   const hasNote = note.trim().length > 0;
 
-  const approveBlockedReason = blockers > 0
-    ? `${plural(blockers, "high-severity finding")} ${blockers === 1 ? "needs" : "need"} a decision before you can approve. Dismiss ${blockers === 1 ? "it" : "them"} with a reason, or request changes.`
-    : null;
+  const blocking = p.latestFindings.filter((f) => f.severity === "high" && (f.status === "open" || f.status === "accepted"));
+  const overrideOk = override.trim().length >= 10;
+  // Approving over high-severity findings is allowed, but only with a written justification (see the confirm step).
+  const approveBlockedReason = null;
   const changesBlockedReason = accepted.length === 0 && !hasNote ? "Accept at least one finding or write a note to request changes." : null;
   const rejectBlockedReason = !hasNote ? "A note explaining the rejection is required." : null;
 
   const summary = blockers > 0
-    ? approveBlockedReason
+    ? `${plural(blockers, "high-severity finding")} ${blockers === 1 ? "is" : "are"} still undecided. Dismiss ${blockers === 1 ? "it" : "them"} with a reason, request changes, or approve with a written justification.`
     : open > 0
       ? `No high-severity blockers. ${plural(open, "finding")} still open: decide each, or approve if you are satisfied they do not apply.`
       : "Every finding has a decision. You can approve, request changes or reject.";
@@ -103,7 +105,11 @@ export function DecisionPanel(p: Props) {
   function submit(outcome: Outcome) {
     setError(null);
     start(async () => {
-      const res = await decideAction(p.submissionId, { outcome, note: note.trim() || null });
+      const res = await decideAction(p.submissionId, {
+        outcome,
+        note: note.trim() || null,
+        overrideReason: outcome === "approved" && blockers > 0 ? override.trim() : null,
+      });
       if (res.ok) {
         setSent({ outcome, draft: res.data.feedbackDraft });
         setConfirming(null);
@@ -148,6 +154,7 @@ export function DecisionPanel(p: Props) {
               <ul className="mt-1 list-disc space-y-0.5 pl-5">
                 <li>Status changes to Approved, tied to this exact text of version {p.versionNumber}.</li>
                 <li>{hasNote ? "Your note, shown on the approval." : "No note."}</li>
+                {blocking.length ? <li>Your override justification, recorded on the approval and on each finding below.</li> : null}
               </ul>
             ) : (
               <ul className="mt-1 list-disc space-y-0.5 pl-5">
@@ -157,9 +164,54 @@ export function DecisionPanel(p: Props) {
               </ul>
             )}
           </div>
+          {confirming === "approved" && blocking.length ? (
+            <div className="space-y-2 border border-warning-line bg-warning-soft p-3">
+              <p className="font-medium text-warning">
+                You are approving over {plural(blocking.length, "high-severity finding")}:
+              </p>
+              <ul className="space-y-1.5">
+                {blocking.map((f) => (
+                  <li key={f.id} className="flex items-start justify-between gap-2 text-foreground">
+                    <span className="min-w-0">
+                      <span className="font-medium">{f.ruleTitle}</span>
+                      <span className="block truncate text-xs text-muted">&ldquo;{f.quote}&rdquo;</span>
+                    </span>
+                    <button
+                      type="button"
+                      className="shrink-0 text-xs text-accent underline underline-offset-4"
+                      onClick={() => {
+                        const el = document.getElementById(`finding-${f.id}`);
+                        el?.scrollIntoView({ block: "center" });
+                        el?.focus();
+                      }}
+                    >
+                      Show
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <label className="block">
+                <span className="text-xs font-medium text-foreground">Why is it acceptable to approve anyway? (required, recorded in the audit trail)</span>
+                <textarea
+                  rows={3}
+                  value={override}
+                  onChange={(e) => setOverride(e.target.value)}
+                  disabled={pending}
+                  className="mt-1 w-full resize-y border border-border-strong bg-background px-2.5 py-1.5 text-sm text-foreground placeholder:text-subtle"
+                  placeholder="For example: Legal confirmed the guarantee language is for a secured product with no credit decision."
+                />
+              </label>
+              {!overrideOk ? <p className="text-xs text-muted">At least 10 characters.</p> : null}
+            </div>
+          ) : null}
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" variant={confirming === "rejected" ? "danger" : "primary"} disabled={pending} onClick={() => submit(confirming)}>
-              {pending ? "Saving..." : `Confirm: ${OUTCOME_VERB[confirming]}`}
+            <Button
+              size="sm"
+              variant={confirming === "rejected" ? "danger" : "primary"}
+              disabled={pending || (confirming === "approved" && blocking.length > 0 && !overrideOk)}
+              onClick={() => submit(confirming)}
+            >
+              {pending ? "Saving..." : confirming === "approved" && blocking.length ? "Approve with override" : `Confirm: ${OUTCOME_VERB[confirming]}`}
             </Button>
             <Button size="sm" variant="ghost" disabled={pending} onClick={() => setConfirming(null)}>Back</Button>
           </div>

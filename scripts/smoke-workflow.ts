@@ -105,18 +105,46 @@ async function main() {
 
     // 5. Reviewer clears whatever remains and approves
     for (const f of v2.findings.filter((x) => x.status === "open")) {
-      await svc.actOnFinding(priya, f.id, { action: "dismiss", reason: "Smoke test: remaining flag judged acceptable" });
+      if (f.severity !== "high") await svc.actOnFinding(priya, f.id, { action: "dismiss", reason: "Smoke test: remaining flag judged acceptable" });
     }
     // every v2 finding is dismissed now, so nothing is accepted and no note is given
     await expectError("request changes needs an accepted finding or a note", "invalid", () => svc.decide(priya, id, { outcome: "changes_requested" }));
     await expectError("rejection needs a note", "invalid", () => svc.decide(priya, id, { outcome: "rejected" }));
-    await svc.decide(priya, id, { outcome: "approved", note: "Smoke test approval." });
+    const highLeft = (await q.getDetail(priya, id)).versions[1].findings.filter((f) => f.severity === "high" && f.status === "open").length;
+    if (highLeft > 0) {
+      await expectError("override needs a real justification", "conflict", () => svc.decide(priya, id, { outcome: "approved", overrideReason: "ok" }));
+      await svc.decide(priya, id, { outcome: "approved", note: "Smoke test approval.", overrideReason: "Smoke test: approved over remaining high findings on purpose." });
+    } else {
+      await svc.decide(priya, id, { outcome: "approved", note: "Smoke test approval." });
+    }
     d = await q.getDetail(sofia, id);
     check("approved: status, decidedAt and two decisions recorded", d.status === "approved" && !!d.decidedAt && d.decisions.length === 2);
     const actions = d.audit.map((a) => a.action);
     check("audit trail covers the whole lifecycle", ["submission.created", "submission.claimed", "finding.accepted", "finding.dismissed", "finding.added", "decision.changes_requested", "submission.resubmitted", "finding.resolved", "decision.approved"].every((a) => actions.includes(a)), `${actions.length} events`);
     check("audit timestamps never go backwards", d.audit.every((a, i) => i === 0 || a.createdAt >= d.audit[i - 1].createdAt));
     await expectError("closed submissions cannot be withdrawn", "conflict", () => svc.withdraw(jordan, id));
+
+    // 5b. Approving over high-severity findings needs a written override, recorded on each finding
+    const second = await svc.createSubmission(jordan, {
+      title: "Smoke test: override", product: example.product, channel: example.channel,
+      states: example.states, content: example.content, priority: "standard",
+    });
+    try {
+      const highs = (await q.getDetail(priya, second.id)).versions[0].findings.filter((f) => f.severity === "high");
+      await expectError("approve without override is refused", "conflict", () => svc.decide(priya, second.id, { outcome: "approved" }));
+      await expectError("too-short override is refused", "conflict", () => svc.decide(priya, second.id, { outcome: "approved", overrideReason: "fine" }));
+      await svc.decide(priya, second.id, { outcome: "approved", overrideReason: "Legal reviewed and accepted these claims for this channel." });
+      const o = await q.getDetail(priya, second.id);
+      const overridden = o.versions[0].findings.filter((f) => f.severity === "high");
+      check("override approves and dismisses every high finding with the justification",
+        o.status === "approved" && overridden.length === highs.length && overridden.every((f) => f.status === "dismissed" && f.dismissReason?.startsWith("Overridden at approval:")),
+        `${highs.length} high findings`);
+      check("override is in the decision note and has one audit entry per finding",
+        (o.decisions.at(-1)?.note ?? "").includes("Justification:") &&
+          o.audit.filter((a) => a.action === "finding.dismissed" && (a.details as { override?: boolean }).override).length === highs.length);
+    } finally {
+      await db.delete(tables.submissions).where(eq(tables.submissions.id, second.id));
+    }
 
     // 6. Dashboard and queue include real data without throwing
     const stats = await q.dashboardStats(sofia);
