@@ -171,7 +171,7 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
               <>
                 <p className="text-xs text-muted">
                   Use <span className="font-medium text-foreground">Replace quoted text</span> to reword a claim and{" "}
-                  <span className="font-medium text-foreground">Append to end</span> to add a missing disclosure.
+                  <span className="font-medium text-foreground">Add to end</span> to add a missing disclosure. They only appear when there is ready-to-use copy.
                 </p>
                 <ol className="space-y-3" aria-label="Findings in the order they appear in the text">
                   {located.map(card)}

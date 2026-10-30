@@ -1,3 +1,4 @@
+import { withInsertText } from "./fix-text";
 import { selectRules } from "./applicable";
 import type { AssetContext, DraftFinding, ProductFacts, RuleDef } from "./types";
 import { stateApplies } from "./states";
@@ -304,7 +305,9 @@ export function runDeterministic(ctx: AssetContext, rules: RuleDef[], facts: Pro
       // A malformed rule must never take the whole review down.
     }
   }
-  return hits
+  const ordered = hits
     .sort((a, b) => a.pos - b.pos || (a.finding.ruleCode < b.finding.ruleCode ? -1 : a.finding.ruleCode > b.finding.ruleCode ? 1 : 0))
     .map((h) => h.finding);
+  // Rule suggestions are instructions, never copy; missing disclosures get the approved text to add.
+  return withInsertText(ordered, rules, facts);
 }

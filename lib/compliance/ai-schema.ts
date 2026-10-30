@@ -11,7 +11,15 @@ export const AiFindingSchema = z.object({
     .string()
     .describe("Text copied verbatim, character for character, from the submission."),
   issue: z.string().describe("What is wrong, in one or two plain sentences."),
-  suggestion: z.string().describe("A compliant rewrite or the disclosure to add."),
+  suggestion: z.string().describe("Guidance for the marketer: what to change and why, in one or two sentences."),
+  replacement: z
+    .string()
+    .nullable()
+    .describe("Exact compliant ad copy that can replace the quoted text word for word, or null if the fix is an addition or needs the marketer's judgement. Never an instruction."),
+  insert_text: z
+    .string()
+    .nullable()
+    .describe("Complete ad copy to add (for example an approved disclosure, verbatim), or null. Never an instruction."),
   confidence: z.enum(["low", "medium", "high"]),
 });
 

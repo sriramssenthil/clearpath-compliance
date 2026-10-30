@@ -1,3 +1,4 @@
+import { usableCopy } from "./fix-text";
 import Anthropic from "@anthropic-ai/sdk";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { AiAnalysisSchema, type AiAnalysis } from "./ai-schema";
@@ -115,6 +116,8 @@ export async function analyzeWithClaude(
       quote: f.quote,
       issue: f.issue,
       suggestion: f.suggestion,
+      replacement: usableCopy(f.replacement, f.quote),
+      insertText: usableCopy(f.insert_text),
       confidence: f.confidence,
     });
   }

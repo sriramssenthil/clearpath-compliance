@@ -108,7 +108,12 @@ export interface DraftFinding {
   /** Verbatim text from the asset (for a missing disclosure: the phrase that triggers the requirement). */
   quote: string;
   issue: string;
+  /** Guidance for a person. May be an instruction ("Add the approved email footer."), so never insert it as copy. */
   suggestion?: string;
+  /** Exact ad copy that can replace `quote` as-is. Absent when the fix is an addition or needs judgement. */
+  replacement?: string;
+  /** Complete ad copy to add (e.g. an approved disclosure), for missing-disclosure findings. */
+  insertText?: string;
   confidence?: "low" | "medium" | "high"; // AI only; used for sorting, never as an accuracy claim
 }
 

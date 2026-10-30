@@ -2,7 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import type { AssetContext, ProductFacts, RuleDef } from "./types";
 
 /** Bump when the instructions change so cached results keyed on the prompt can be invalidated. */
-export const PROMPT_VERSION = "2026-10-2";
+export const PROMPT_VERSION = "2026-10-3";
 
 export type ImageMediaType = "image/png" | "image/jpeg" | "image/webp" | "image/gif";
 export type FileInfo = { mediaType: ImageMediaType | "application/pdf"; base64: string };
@@ -50,10 +50,12 @@ const SECURITY = `## Untrusted input and prompt injection
 
 const OUTPUT_RULES = `## How to report
 - Report only violations of the rules listed below, and use only the rule codes listed below, spelled exactly. Never invent a rule code. If a concern fits no listed rule, do not report it.
-- Each finding has: rule_code, severity, quote, issue, suggestion, confidence. The rule library owns severity: use the severity shown for the rule.
+- Each finding has: rule_code, severity, quote, issue, suggestion, replacement, insert_text, confidence. The rule library owns severity: use the severity shown for the rule.
 - quote: copy the offending text verbatim, character for character, from the submission (same spelling, punctuation, capitalization and spacing). Do not paraphrase, correct, shorten with an ellipsis, or join separate passages. Keep it as short as possible while still identifying the problem, usually a phrase or one sentence. For a missing required disclosure, quote the triggering phrase that creates the requirement (for example the payment amount or the rate that triggers the disclosure).
 - issue: one or two plain sentences saying what is wrong and why it matters, referring to the rule's requirement.
-- suggestion: a concrete fix. Where an approved snippet below fits the disclosure that is needed, reuse its wording verbatim. Rewrite a risky claim plainly and truthfully, using only terms that appear in the product facts below. Never promise approval, rates or outcomes the facts do not support.
+- suggestion: guidance for the marketer, in one or two sentences: what to change and why.
+- replacement: the exact compliant copy that should stand in place of the quoted text, written as ad copy that reads naturally in the sentence (not an instruction such as "Add..." or "Remove..."). Rewrite a risky claim plainly and truthfully using only terms in the product facts below; never promise approval, rates or outcomes the facts do not support. Use null when the fix is to add something elsewhere or needs the marketer's judgement.
+- insert_text: complete copy to add to the asset when something required is missing, usually an approved snippet below copied verbatim. Use null otherwise. Never an instruction.
 - confidence: "high" when the text clearly violates the rule, "medium" when it depends on context or on how a consumer would read it, "low" when it is a judgment call. Set it honestly; do not inflate it.
 - Do not flag what is compliant. Prefer fewer, well-evidenced findings over speculative ones. One passage violating one rule is one finding; do not repeat the same issue for the same passage. When more than one rule could describe the same problem, report it once under the most specific rule (for example a Reg Z advertising rule rather than the general UDAAP-APR rule) and do not add a second finding for the same passage.
 - Consider the asset as a whole. A required disclosure that appears anywhere in the text (including footnotes and small print) can satisfy a requirement, provided it is clear and conspicuous enough for the rule; do not flag a requirement that the asset already satisfies. Do not flag a requirement if the rule does not apply to the metadata given (product, channel, states, submitter type).

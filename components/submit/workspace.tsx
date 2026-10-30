@@ -97,14 +97,19 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
 
   const apply = (key: number, mode: "replace" | "append") => {
     const f = sorted[key];
-    if (!f?.suggestion) return;
+    const copy = mode === "replace" ? f?.replacement : f?.insertText;
+    if (!f || !copy) return;
+    if (mode === "append" && text.includes(copy)) {
+      setNote(key, "This text is already in the asset (another finding may have added it).");
+      return;
+    }
     if (mode === "replace" && inFile(key)) {
       setNote(key, "This wording is in the uploaded file. Change it in the ad itself and upload the new file, then re-run the pre-check.");
       return;
     }
-    const edit = mode === "replace" ? replaceQuote(text, f.quote, f.suggestion) : appendText(text, f.suggestion);
+    const edit = mode === "replace" ? replaceQuote(text, f.quote, copy) : appendText(text, copy);
     if (!edit) {
-      setNote(key, "That quoted text is no longer in the editor. Use Append to end or Copy instead.");
+      setNote(key, "That quoted text is no longer in the editor. Copy the replacement and edit the text by hand.");
       return;
     }
     onTextChange(edit.text);
@@ -117,6 +122,9 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-2">
+      {/* On wide screens the editor stays in view between the header and the sticky submit bar, so its
+          controls (including Re-run pre-check) are never hidden under the bar while the findings scroll. */}
+      <div className="lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-4.5rem-5.5rem)] lg:overflow-y-auto">
       <AssetEditor
         ref={editorRef}
         value={text}
@@ -142,6 +150,7 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
         fileSlot={fileSlot}
         hasFile={hasFile}
       />
+      </div>
       <PrecheckPanel
         pre={pre}
         sorted={sorted}

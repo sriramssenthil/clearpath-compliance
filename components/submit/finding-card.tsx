@@ -26,10 +26,12 @@ interface Props {
 export function FindingCard({ index, finding: f, info, located, active, note, onReplace, onAppend, onShow, children }: Props) {
   const [copied, setCopied] = useState(false);
 
+  // One-click edits only ever insert real ad copy, never the guidance text (which may be an instruction).
+  const copyText = f.replacement ?? f.insertText ?? f.suggestion;
   const copy = async () => {
-    if (!f.suggestion) return;
+    if (!copyText) return;
     try {
-      await navigator.clipboard.writeText(f.suggestion);
+      await navigator.clipboard.writeText(copyText);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -78,22 +80,39 @@ export function FindingCard({ index, finding: f, info, located, active, note, on
         ) : null}
       </div>
 
-      {f.suggestion ? (
+      {f.suggestion || f.replacement || f.insertText ? (
         <div className="mt-3 rounded-md border border-success-line bg-success-soft p-3">
           <p className="text-xs font-medium uppercase tracking-wide text-success">Suggested fix</p>
-          <p className="mt-1 whitespace-pre-wrap text-sm text-foreground [overflow-wrap:anywhere]">{f.suggestion}</p>
+          {f.suggestion ? <p className="mt-1 whitespace-pre-wrap text-sm text-foreground [overflow-wrap:anywhere]">{f.suggestion}</p> : null}
+          {f.replacement ? (
+            <div className="mt-2">
+              <p className="text-xs text-muted">Replace the quoted text with:</p>
+              <p className="mt-1 whitespace-pre-wrap border-l-2 border-success-line pl-2 text-sm text-foreground [overflow-wrap:anywhere]">{f.replacement}</p>
+            </div>
+          ) : null}
+          {f.insertText ? (
+            <div className="mt-2">
+              <p className="text-xs text-muted">Add this text:</p>
+              <p className="mt-1 whitespace-pre-wrap border-l-2 border-success-line pl-2 text-sm text-foreground [overflow-wrap:anywhere]">{f.insertText}</p>
+            </div>
+          ) : null}
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button size="sm" variant="secondary" onClick={onReplace} title="Swap the first occurrence of the quoted text for this suggestion">
-              Replace quoted text
-            </Button>
-            <Button size="sm" variant="secondary" onClick={onAppend} title="Add the suggestion as a new paragraph at the end of the text, for missing disclosures">
-              Append to end
-            </Button>
+            {f.replacement ? (
+              <Button size="sm" variant="secondary" onClick={onReplace} title="Swap the first occurrence of the quoted text for the replacement above">
+                Replace quoted text
+              </Button>
+            ) : null}
+            {f.insertText ? (
+              <Button size="sm" variant="secondary" onClick={onAppend} title="Add the text above as a new paragraph at the end">
+                Add to end
+              </Button>
+            ) : null}
             <Button size="sm" variant="ghost" onClick={copy}>
               {copied ? <Check aria-hidden className="size-3.5" /> : <Copy aria-hidden className="size-3.5" />}
               {copied ? "Copied" : "Copy"}
             </Button>
           </div>
+          {!f.replacement && !f.insertText ? <p className="mt-2 text-xs text-muted">This one needs your judgement, so there is no one-click edit.</p> : null}
           <p role="status" className="mt-2 min-h-4 text-xs text-muted">
             {note ?? ""}
           </p>
