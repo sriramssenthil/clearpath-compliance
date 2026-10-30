@@ -2,7 +2,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 import type { AssetContext, ProductFacts, RuleDef } from "./types";
 
 /** Bump when the instructions change so cached results keyed on the prompt can be invalidated. */
-export const PROMPT_VERSION = "2026-10-3";
+export const PROMPT_VERSION = "2026-10-4";
 
 export type ImageMediaType = "image/png" | "image/jpeg" | "image/webp" | "image/gif";
 export type FileInfo = { mediaType: ImageMediaType | "application/pdf"; base64: string };
@@ -60,7 +60,7 @@ const OUTPUT_RULES = `## How to report
 - Do not flag what is compliant. Prefer fewer, well-evidenced findings over speculative ones. One passage violating one rule is one finding; do not repeat the same issue for the same passage. When more than one rule could describe the same problem, report it once under the most specific rule (for example a Reg Z advertising rule rather than the general UDAAP-APR rule) and do not add a second finding for the same passage.
 - Consider the asset as a whole. A required disclosure that appears anywhere in the text (including footnotes and small print) can satisfy a requirement, provided it is clear and conspicuous enough for the rule; do not flag a requirement that the asset already satisfies. Do not flag a requirement if the rule does not apply to the metadata given (product, channel, states, submitter type).
 - If the asset has no violations, return an empty findings list.
-- summary: two or three sentences describing what the asset says and the main concerns, or that no issues were found.
+- summary: one or two sentences describing what the asset is and what it offers. Do not say whether it complies or how many issues it has; that verdict is computed separately from the final findings.
 
 ## Images and PDFs
 - A submission may be an attached image or PDF, typed copy (inside the submission tags), or both (for example a banner plus its caption). Review the file and the copy together as one asset.

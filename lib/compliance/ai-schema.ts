@@ -28,7 +28,7 @@ export const AiAnalysisSchema = z.object({
     .string()
     .nullable()
     .describe("Faithful transcription of an attached image or PDF, including small print; null for text-only submissions."),
-  summary: z.string().describe("Two or three sentences describing what the asset says and the main concerns."),
+  summary: z.string().describe("One or two sentences describing what the asset is and offers. No verdict on compliance."),
   findings: z.array(AiFindingSchema),
 });
 

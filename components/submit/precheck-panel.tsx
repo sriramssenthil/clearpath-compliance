@@ -138,15 +138,22 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
                   </span>
                 ))}
               </div>
-              <p
-                className={cn(
-                  "mt-3 flex items-center gap-2 text-sm font-medium",
-                  analysis.recommendation === "needs_changes" ? "text-warning" : "text-success",
-                )}
-              >
-                {analysis.recommendation === "needs_changes" ? <TriangleAlert aria-hidden className="size-4" /> : <CheckCircle2 aria-hidden className="size-4" />}
-                {analysis.recommendation === "needs_changes" ? "Likely to need changes" : "No issues found by the automated check"}
-              </p>
+              {(() => {
+                // The verdict always agrees with the findings: "no issues" only when there are none.
+                const n = analysis.findings.length;
+                const verdict =
+                  n === 0
+                    ? { tone: "text-success", Icon: CheckCircle2, text: "No issues found by the automated check" }
+                    : analysis.recommendation === "needs_changes"
+                      ? { tone: "text-warning", Icon: TriangleAlert, text: "Likely to need changes" }
+                      : { tone: "text-warning", Icon: TriangleAlert, text: `${n === 1 ? "1 minor issue" : `${n} minor issues`} to review before submitting` };
+                return (
+                  <p className={cn("mt-3 flex items-center gap-2 text-sm font-medium", verdict.tone)}>
+                    <verdict.Icon aria-hidden className="size-4" />
+                    {verdict.text}
+                  </p>
+                );
+              })()}
               <p className="mt-0.5 text-xs text-muted">This pre-check is advisory. Compliance makes the final call.</p>
             </div>
 

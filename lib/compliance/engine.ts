@@ -1,3 +1,4 @@
+import { composeSummary } from "./summary";
 import type Anthropic from "@anthropic-ai/sdk";
 import { selectAiRules } from "./applicable";
 import { AiAnalysisError, analyzeWithClaude, type ClaudeOptions, type ClaudeResult } from "./claude";
@@ -71,11 +72,8 @@ export async function analyzeAsset(ctx: AssetContext, opts: EngineOptions): Prom
   const merged = mergeFindings(content, deterministic, ai?.findings ?? [], { applicableRuleCodes, knownRuleCodes });
   const risk = computeRisk(merged.findings, ctx, opts.partnerRejectionRate);
 
-  const summary =
-    ai?.summary ??
-    (merged.findings.length
-      ? `${merged.findings.length} issue${merged.findings.length === 1 ? "" : "s"} found by automated rules.`
-      : "No issues found by automated rules.");
+  // The verdict comes from the final findings; the model only describes the asset (see summary.ts).
+  const summary = composeSummary(merged.findings, ai?.summary);
 
   return {
     findings: merged.findings,
