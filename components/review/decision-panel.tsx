@@ -96,11 +96,19 @@ export function DecisionPanel(p: Props) {
   const changesBlockedReason = accepted.length === 0 && !hasNote ? "Accept at least one finding or write a note to request changes." : null;
   const rejectBlockedReason = !hasNote ? "A note explaining the rejection is required." : null;
 
-  const summary = blockers > 0
-    ? `${plural(blockers, "high-severity finding")} ${blockers === 1 ? "is" : "are"} still undecided. Dismiss ${blockers === 1 ? "it" : "them"} with a reason, request changes, or approve with a written justification.`
-    : open > 0
-      ? `No high-severity blockers. ${plural(open, "finding")} still open: decide each, or approve if you are satisfied they do not apply.`
-      : "Every finding has a decision. You can approve, request changes or reject.";
+  const openHigh = p.latestFindings.filter((f) => f.severity === "high" && f.status === "open").length;
+  const acceptedHigh = accepted.filter((f) => f.severity === "high").length;
+  // Accepted findings are decided: the reviewer confirmed them as required changes. The natural next step is
+  // to send them back, so "Request changes" becomes the primary action.
+  const suggestChanges = accepted.length > 0 && openHigh === 0;
+  const summary =
+    openHigh > 0
+      ? `${plural(openHigh, "high-severity finding")} still ${openHigh === 1 ? "needs" : "need"} a decision: accept ${openHigh === 1 ? "it" : "them"} as a required change or dismiss ${openHigh === 1 ? "it" : "them"} with a reason.`
+      : accepted.length > 0
+        ? `You accepted ${plural(accepted.length, "finding")} as required change${accepted.length === 1 ? "" : "s"}${acceptedHigh ? ` (${acceptedHigh} high severity)` : ""}${open > 0 ? `, and ${plural(open, "finding")} ${open === 1 ? "is" : "are"} still open` : ""}. Next step: request changes to send ${accepted.length === 1 ? "it" : "them"} to ${first}.${acceptedHigh ? " Approving instead would approve over confirmed issues and needs a written justification." : ""}`
+        : open > 0
+          ? `No high-severity blockers. ${plural(open, "finding")} still open: decide each, or approve if you are satisfied they do not apply.`
+          : "Every finding has a decision. You can approve, request changes or reject.";
 
   function submit(outcome: Outcome) {
     setError(null);
@@ -125,7 +133,7 @@ export function DecisionPanel(p: Props) {
   return (
     <section aria-label="Decision" className="space-y-3 rounded-lg border border-border-strong bg-surface p-3.5 text-sm shadow-card">
       <h3 className="font-medium text-foreground">Your decision</h3>
-      <p id="decision-state" className={blockers > 0 ? "text-sev-high" : "text-muted"}>{summary}</p>
+      <p id="decision-state" className={openHigh > 0 ? "text-sev-high" : suggestChanges ? "text-foreground" : "text-muted"}>{summary}</p>
 
       {sent ? (
         <p role="status" className="rounded-md border border-success-line bg-success-soft px-2.5 py-1.5 text-success">Decision recorded.</p>
@@ -167,13 +175,15 @@ export function DecisionPanel(p: Props) {
           {confirming === "approved" && blocking.length ? (
             <div className="space-y-2 border border-warning-line bg-warning-soft p-3">
               <p className="font-medium text-warning">
-                You are approving over {plural(blocking.length, "high-severity finding")}:
+                You are approving over {plural(blocking.length, "high-severity finding")}
+                {blocking.some((f) => f.status === "accepted") ? ", including ones you accepted as confirmed issues" : ""}:
               </p>
               <ul className="space-y-1.5">
                 {blocking.map((f) => (
                   <li key={f.id} className="flex items-start justify-between gap-2 text-foreground">
                     <span className="min-w-0">
                       <span className="font-medium">{f.ruleTitle}</span>
+                      <span className="ml-1.5 text-xs text-muted">({f.status === "accepted" ? "accepted" : "undecided"})</span>
                       <span className="block truncate text-xs text-muted">&ldquo;{f.quote}&rdquo;</span>
                     </span>
                     <button
@@ -224,7 +234,9 @@ export function DecisionPanel(p: Props) {
               return (
                 <Button
                   key={o}
-                  variant={o === "approved" ? "primary" : o === "rejected" ? "danger" : "secondary"}
+                  variant={
+                    o === "rejected" ? "danger" : (o === "changes_requested") === suggestChanges ? "primary" : "secondary"
+                  }
                   disabled={pending || reason !== null}
                   aria-describedby={reason ? `blocked-${o}` : undefined}
                   title={reason ?? undefined}

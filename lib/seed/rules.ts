@@ -38,7 +38,7 @@ export const RULES: RuleDef[] = [
       type: "required",
       triggers: [
         r`\$\s?\d[\d,]*(?:\.\d{2})?\s*(?:\/|\ba\b|per|each)\s*(?:mo\b|month)`,
-        r`\b(?:monthly\s+)?payments?\s+(?:as low as|from|starting at|of|under|just)\s+\$\s?\d`,
+        r`\b(?:monthly\s+)?payments?\s+(?:as low as|from|starting at|of|under|just)\s+\$\s?\d[\d,]*(?:\.\d{2})?`,
         r`\$\s?\d[\d,]*(?:\.\d{2})?\s+(?:monthly\s+)?payments?\b`,
         r`\bterms?\s+(?:up to|as long as|of|from|as short as)\s+\d{2,3}\s+months?\b`,
         r`\b\d{2,3}\s*(?:to|-|–|—)\s*\d{2,3}[- ]month\s+(?:terms?|loans?|financing|repayment)`,

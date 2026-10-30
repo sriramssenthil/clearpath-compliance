@@ -643,3 +643,13 @@ describe("approved snippets agree with the rules", () => {
     expect(fires(byCode("REGZ-16-TRIGGER"), both)).toBe(false);
   });
 });
+
+describe("regression: payment amounts are quoted whole", () => {
+  it("captures the full dollar amount, including thousands separators and cents", () => {
+    const rule = RULES.find((r) => r.code === "REGZ-24-TRIGGER")!;
+    const triggers = rule.config.type === "required" ? (rule.config.triggers ?? []) : [];
+    const hits = (text: string) => triggers.map((p) => new RegExp(p, "iu").exec(text)?.[0]).filter(Boolean);
+    expect(hits("and come with payments as low as $1,650 a month.")).toContain("payments as low as $1,650");
+    expect(hits("monthly payments from $249.99 for 36 months")).toContain("monthly payments from $249.99");
+  });
+});
