@@ -31,6 +31,10 @@ interface Props {
   latestFindings: FindingVM[];
   canDecide: boolean;
   lastDecision: ClosedDecision | null;
+  /** Changes whenever another reason box opens (or Escape is pressed); closes the confirm step. */
+  closeSignal?: number;
+  /** Called when the confirm step opens, so the workspace can close other reason boxes. */
+  onConfirmOpen?: () => void;
 }
 
 const OUTCOME_VERB: Record<Outcome, string> = { approved: "Approve", changes_requested: "Request changes", rejected: "Reject" };
@@ -38,7 +42,11 @@ const OUTCOME_VERB: Record<Outcome, string> = { approved: "Approve", changes_req
 export function DecisionPanel(p: Props) {
   const [note, setNote] = useState("");
   const [override, setOverride] = useState("");
-  const [confirming, setConfirming] = useState<Outcome | null>(null);
+  // The confirm step belongs to the close signal it was opened under, so a newer signal (another reason
+  // box opening, or Escape) closes it without an effect.
+  const [confirmState, setConfirmState] = useState<{ outcome: Outcome; signal: number | undefined } | null>(null);
+  const confirming = confirmState && confirmState.signal === p.closeSignal ? confirmState.outcome : null;
+  const setConfirming = (o: Outcome | null) => setConfirmState(o ? { outcome: o, signal: p.closeSignal } : null);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState<{ outcome: Outcome; draft: string | null } | null>(null);
   const [pending, start] = useTransition();
@@ -243,6 +251,7 @@ export function DecisionPanel(p: Props) {
                   onClick={() => {
                     setError(null);
                     setConfirming(o);
+                    p.onConfirmOpen?.();
                   }}
                 >
                   {OUTCOME_VERB[o]}

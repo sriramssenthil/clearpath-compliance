@@ -150,21 +150,15 @@ export function HighlightedText({ content, marks, selectedId, pulseKey = 0, onSe
           const selected = selectedId !== null && seg.ids.includes(selectedId);
           const more = seg.ids.length > 1 ? ` (+${seg.ids.length - 1} overlapping)` : "";
           return (
+            // Not focusable on purpose: a tabindex stops Chrome from starting a text selection inside the mark,
+            // which broke "select text to add a finding". Keyboard users reach findings via the cards and j/k.
             <mark
               key={seg.start}
               data-start={seg.start}
               data-finding={seg.ids.join(" ")}
-              tabIndex={onSelect ? 0 : undefined}
               title={m.label + more}
               className={markClass(m, selected, selected && pulsing)}
               onClick={onSelect ? () => onSelect(primaryId) : undefined}
-              onKeyDown={
-                onSelect
-                  ? (e) => {
-                      if (e.key === "Enter") onSelect(primaryId);
-                    }
-                  : undefined
-              }
             >
               {seg.text}
             </mark>

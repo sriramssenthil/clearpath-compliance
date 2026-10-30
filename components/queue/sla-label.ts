@@ -65,14 +65,8 @@ export function isFastLane(s: { status: Status; riskLevel: "low" | "medium" | "h
 }
 
 /** "just now", "5 minutes ago", "3 hours ago", "2 days ago". */
-export function relativeTime(then: Date, now: Date): string {
-  const ms = Math.max(0, now.getTime() - then.getTime());
-  if (ms < MIN) return "just now";
-  const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? "" : "s"} ago`;
-  if (ms < HOUR) return plural(Math.floor(ms / MIN), "minute");
-  if (ms < DAY) return plural(Math.floor(ms / HOUR), "hour");
-  return plural(Math.floor(ms / DAY), "day");
-}
+import { relativeTime } from "@/lib/time";
+export { relativeTime };
 
 /**
  * Launch dates are calendar days stored as UTC midnight, so they are formatted in UTC.

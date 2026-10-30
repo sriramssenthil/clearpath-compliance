@@ -1,3 +1,4 @@
+import { relativeTime } from "@/lib/time";
 import type { Metadata } from "next";
 import { connection } from "next/server";
 import { asc } from "drizzle-orm";
@@ -13,18 +14,8 @@ export const metadata: Metadata = { title: "Team" };
 
 const ABSOLUTE = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
 const DATE = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
-const RELATIVE = new Intl.RelativeTimeFormat("en-US", { numeric: "auto" });
 
-function relative(date: Date, now: number): string {
-  const diff = (date.getTime() - now) / 1000;
-  const units: [Intl.RelativeTimeFormatUnit, number][] = [
-    ["day", 86400],
-    ["hour", 3600],
-    ["minute", 60],
-  ];
-  for (const [unit, secs] of units) if (Math.abs(diff) >= secs) return RELATIVE.format(Math.round(diff / secs), unit);
-  return "just now";
-}
+const relative = (date: Date, now: number) => relativeTime(date, new Date(now));
 
 function When({ date, now, mode = "relative" }: { date: Date; now: number; mode?: "relative" | "date" }) {
   return (

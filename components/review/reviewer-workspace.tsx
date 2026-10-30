@@ -54,7 +54,23 @@ export function ReviewerWorkspace(p: Props) {
   const [legend, setLegend] = useState(false);
   const [pendingId, setPendingId] = useState<number | null>(null);
   const [errors, setErrors] = useState<Record<number, string>>({});
-  const [dismissOpenId, setDismissOpenId] = useState<number | null>(null);
+  const [dismissOpenId, setDismissOpenIdRaw] = useState<number | null>(null);
+  // Only one reason box is open at a time: opening a dismiss form closes the decision confirm step and vice versa.
+  const [decisionCloseSignal, setDecisionCloseSignal] = useState(0);
+  const setDismissOpenId = useCallback((id: number | null) => {
+    setDismissOpenIdRaw(id);
+    if (id !== null) setDecisionCloseSignal((n) => n + 1);
+  }, []);
+
+  useEffect(() => {
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      setDismissOpenIdRaw(null);
+      setDecisionCloseSignal((n) => n + 1);
+    };
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, []);
   const [draft, setDraft] = useState<TextSelection | null>(null);
   const [, startTransition] = useTransition();
 
@@ -101,7 +117,7 @@ export function ReviewerWorkspace(p: Props) {
         setPendingId(null);
       });
     },
-    [ordered, p.submissionId, filter, selectedId, select],
+    [ordered, p.submissionId, filter, selectedId, select, setDismissOpenId],
   );
 
   useEffect(() => {
@@ -132,7 +148,7 @@ export function ReviewerWorkspace(p: Props) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [ordered, selectedId, canAct, pendingId, p.findings, select, run]);
+  }, [ordered, selectedId, canAct, pendingId, p.findings, select, run, setDismissOpenId]);
 
   const addFinding = canAct
     ? (sel: TextSelection) => {
@@ -245,6 +261,11 @@ export function ReviewerWorkspace(p: Props) {
               latestFindings={p.latestFindings}
               canDecide={p.permissions.canDecide}
               lastDecision={p.lastDecision}
+              closeSignal={decisionCloseSignal}
+              onConfirmOpen={() => {
+                setDismissOpenIdRaw(null);
+                setDraft(null);
+              }}
             />
           </div>
         </aside>

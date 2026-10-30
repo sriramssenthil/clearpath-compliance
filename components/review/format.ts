@@ -4,20 +4,11 @@ const ABS = new Intl.DateTimeFormat("en-US", {
   month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC",
 });
 const DAY = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
-const REL = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
 export const formatDateTime = (d: Date) => `${ABS.format(d)} UTC`;
 export const formatDay = (d: Date) => DAY.format(d);
 
-export function relativeTime(d: Date, now: Date): string {
-  const sec = Math.round((d.getTime() - now.getTime()) / 1000);
-  const abs = Math.abs(sec);
-  if (abs < 45) return "just now";
-  if (abs < 3600) return REL.format(Math.round(sec / 60), "minute");
-  if (abs < 86400) return REL.format(Math.round(sec / 3600), "hour");
-  if (abs < 86400 * 30) return REL.format(Math.round(sec / 86400), "day");
-  return REL.format(Math.round(sec / (86400 * 30)), "month");
-}
+export { relativeTime } from "@/lib/time";
 
 export type SlaTone = "success" | "warning" | "danger";
 

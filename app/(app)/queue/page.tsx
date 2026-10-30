@@ -50,6 +50,19 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
     defaultView ? null : listQueue(actor),
     db.select({ id: tables.partners.id, name: tables.partners.name }).from(tables.partners).orderBy(asc(tables.partners.name)),
   ]);
+  // When filters find nothing in this tab, say where matches do exist instead of leaving a dead end.
+  const elsewhere =
+    rows.length === 0 && activeFilterCount(view) > 0
+      ? (
+          await Promise.all(
+            STATUS_VIEWS.filter((v) => v.key !== view.status && v.key !== "all").map(async (v) => ({
+              key: v.key,
+              label: v.label,
+              count: (await listPrioritizedQueue(actor, toQueueFilters({ ...view, status: v.key }), view.sort, now)).length,
+            })),
+          )
+        ).filter((v) => v.count > 0)
+      : [];
   const stats = queueStats(wholeQueue ?? rows);
   const filtered = activeFilterCount(view);
   const empty = EMPTY[view.status];
@@ -73,8 +86,9 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
         <p className="mt-2 text-xs text-subtle">These four figures cover the whole review queue, regardless of the filters below.</p>
       </section>
 
-      <nav aria-label="Queue view" className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-        <ul className="inline-flex gap-1 rounded-lg border border-border bg-surface-muted p-1">
+      {/* Two rows of two on phones, so every view is visible without hidden horizontal scrolling. */}
+      <nav aria-label="Queue view">
+        <ul className="grid grid-cols-2 gap-1 rounded-lg border border-border bg-surface-muted p-1 sm:inline-flex">
           {STATUS_VIEWS.map((s) => {
             const active = s.key === view.status;
             return (
@@ -83,7 +97,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
                   href={queueHref({ ...view, status: s.key })}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-8 items-center whitespace-nowrap rounded-md px-3 text-sm font-medium transition-colors",
+                    "flex h-8 items-center justify-center whitespace-nowrap rounded-md px-3 text-sm font-medium transition-colors",
                     active ? "bg-surface text-foreground shadow-card" : "text-muted hover:text-foreground",
                   )}
                 >
@@ -112,7 +126,22 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
             <CardBody className="flex flex-col items-center gap-2 py-12 text-center">
               {filtered > 0 ? <SearchX aria-hidden className="size-8 text-subtle" /> : <CheckCircle2 aria-hidden className="size-8 text-success" />}
               <p className="font-medium">{filtered > 0 ? "No submissions match these filters" : empty.title}</p>
-              <p className="max-w-md text-sm text-muted">{filtered > 0 ? "Try removing a filter or searching for a different code or title." : empty.body}</p>
+              <p className="max-w-md text-sm text-muted">
+                {filtered > 0
+                  ? elsewhere.length > 0
+                    ? `Nothing in ${STATUS_VIEWS.find((v) => v.key === view.status)!.label} matches, but other views do:`
+                    : "Try removing a filter or searching for a different code or title."
+                  : empty.body}
+              </p>
+              {elsewhere.length > 0 ? (
+                <div className="mt-2 flex flex-wrap justify-center gap-2" role="status">
+                  {elsewhere.map((v) => (
+                    <Link key={v.key} href={queueHref({ ...view, status: v.key })} className={buttonVariants({ variant: "primary", size: "sm" })}>
+                      {v.count} {v.count === 1 ? "match" : "matches"} in {v.label}
+                    </Link>
+                  ))}
+                </div>
+              ) : null}
               {filtered > 0 ? (
                 <Link href={queueHref({ status: view.status, sort: view.sort })} className={buttonVariants({ variant: "secondary", size: "sm", className: "mt-2" })}>
                   Clear filters

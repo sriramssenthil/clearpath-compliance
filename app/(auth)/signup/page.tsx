@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { asc } from "drizzle-orm";
@@ -14,11 +15,23 @@ async function loadPartners() {
   return db.select({ id: tables.partners.id, name: tables.partners.name }).from(tables.partners).orderBy(asc(tables.partners.name));
 }
 
-export default async function SignupPage() {
+/** Same pattern as the login page: the form paints from the static shell; the session-aware version replaces it. */
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<SignupCard partners={[]} demoUserName={null} />}>
+      <SignupWithSession />
+    </Suspense>
+  );
+}
+
+async function SignupWithSession() {
   const user = await getCurrentUser();
   if (user && !user.isDemo) redirect(PERSONAS[user.role].defaultRoute);
   const partners = await loadPartners();
+  return <SignupCard partners={partners} demoUserName={user?.isDemo ? user.name : null} />;
+}
 
+function SignupCard({ partners, demoUserName }: { partners: { id: number; name: string }[]; demoUserName: string | null }) {
   return (
     <AuthCard
       title="Create an account"
@@ -33,9 +46,9 @@ export default async function SignupPage() {
         </p>
       }
     >
-      {user?.isDemo ? (
+      {demoUserName ? (
         <FormMessage tone="info" className="mb-5">
-          You are exploring as {user.name}, a demo persona. Creating an account replaces that session.
+          You are exploring as {demoUserName}, a demo persona. Creating an account replaces that session.
         </FormMessage>
       ) : null}
       <SignupForm partners={partners} />
