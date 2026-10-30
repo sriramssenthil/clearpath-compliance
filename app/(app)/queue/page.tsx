@@ -1,3 +1,4 @@
+import { LinkPending } from "@/components/ui/link-pending";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2, SearchX } from "lucide-react";
@@ -97,11 +98,12 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
                   href={queueHref({ ...view, status: s.key })}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "flex h-8 items-center justify-center whitespace-nowrap rounded-md px-3 text-sm font-medium transition-colors",
+                    "flex h-8 items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 text-sm font-medium transition-colors",
                     active ? "bg-surface text-foreground shadow-card" : "text-muted hover:text-foreground",
                   )}
                 >
                   {s.label}
+                  <LinkPending />
                 </Link>
               </li>
             );

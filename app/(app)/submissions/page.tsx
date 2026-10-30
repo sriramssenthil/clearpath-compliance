@@ -1,3 +1,4 @@
+import { LinkPending } from "@/components/ui/link-pending";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FileText, Plus, SearchX } from "lucide-react";
@@ -95,6 +96,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
                       )}
                     >
                       {c.label}
+                      <LinkPending />
                       <span className={cn("rounded-full px-1.5 text-xs tabular-nums", active ? "bg-accent/10" : "bg-surface-muted")}>
                         <span className="sr-only">: </span>
                         {c.count}
@@ -136,7 +138,19 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
           <CardBody className="flex flex-col items-center gap-3 py-12 text-center">
             <SearchX aria-hidden className="size-8 text-subtle" />
             <h2 className="text-base font-medium">No submissions match these filters</h2>
-            <p className="max-w-md text-sm text-muted">Try a different status, product or search term.</p>
+            {status && scoped.length > 0 ? (
+              <>
+                <p className="max-w-md text-sm text-muted">
+                  None are {STATUS_LABEL[status].toLowerCase()}, but {scoped.length} {scoped.length === 1 ? "submission matches" : "submissions match"} in other statuses.
+                </p>
+                <Link href={href({ q, product, status: "" })} className={buttonVariants({ variant: "primary" })}>
+                  Show {scoped.length} {scoped.length === 1 ? "match" : "matches"} in all statuses
+                  <LinkPending />
+                </Link>
+              </>
+            ) : (
+              <p className="max-w-md text-sm text-muted">Try a different status, product or search term.</p>
+            )}
             <Link href="/submissions" className={buttonVariants({ variant: "secondary" })}>
               Clear filters
             </Link>

@@ -1,6 +1,8 @@
 "use client";
 
+import Form from "next/form";
 import Link from "next/link";
+import { useFormStatus } from "react-dom";
 import { Search } from "lucide-react";
 import { PRODUCTS } from "@/lib/compliance/types";
 import { Button } from "@/components/ui/button";
@@ -14,10 +16,10 @@ interface Props {
   filtered: boolean;
 }
 
-/** A plain GET form, so it works without scripts; the product select submits as soon as it changes. */
+/** next/form: a GET form that navigates client-side (and still works without scripts). The select submits on change. */
 export function ListFilters({ q, product, status, filtered }: Props) {
   return (
-    <form method="get" action="/submissions" role="search" aria-label="Filter submissions" className="flex flex-wrap items-end gap-3">
+    <Form action="/submissions" role="search" aria-label="Filter submissions" className="flex flex-wrap items-end gap-3">
       {status ? <input type="hidden" name="status" value={status} /> : null}
       <div className="min-w-0 flex-1 basis-56">
         <label htmlFor="q" className="sr-only">
@@ -47,14 +49,21 @@ export function ListFilters({ q, product, status, filtered }: Props) {
           ))}
         </select>
       </div>
-      <Button type="submit" variant="secondary">
-        Search
-      </Button>
+      <SearchButton />
       {filtered ? (
         <Link href="/submissions" className="self-center text-sm font-medium text-muted underline-offset-2 hover:text-foreground hover:underline">
           Clear filters
         </Link>
       ) : null}
-    </form>
+    </Form>
+  );
+}
+
+function SearchButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" variant="secondary" disabled={pending} aria-live="polite">
+      {pending ? "Searching..." : "Search"}
+    </Button>
   );
 }
