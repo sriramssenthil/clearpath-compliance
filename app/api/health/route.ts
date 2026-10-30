@@ -1,11 +1,12 @@
-import { count } from "drizzle-orm";
 import { connection } from "next/server";
-import { db, tables } from "@/lib/db";
 
 /** Liveness check for the deployment: database reachable, data seeded, AI key configured (never its value). */
 export async function GET() {
   await connection();
   try {
+    // Imported here, not at the top: lib/db throws when DATABASE_URL is unset, and that must not break `next build`.
+    const { count } = await import("drizzle-orm");
+    const { db, tables } = await import("@/lib/db");
     const [[rules], [subs]] = await Promise.all([
       db.select({ n: count() }).from(tables.rules),
       db.select({ n: count() }).from(tables.submissions),
