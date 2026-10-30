@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any -- the fake Anthropic client is deliberately loosely typed */
 import type Anthropic from "@anthropic-ai/sdk";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { AiAnalysisError, analyzeWithClaude } from "@/lib/compliance/claude";

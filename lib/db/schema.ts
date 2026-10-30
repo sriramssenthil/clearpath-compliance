@@ -169,3 +169,11 @@ export const auditEvents = pgTable(
   },
   (t) => [index("audit_submission_idx").on(t.submissionId)],
 );
+
+// Analysis results keyed by a hash of (content, metadata, rules, model). A pre-check followed by a
+// submit of the same text costs one model call, and the demo's example ads respond instantly.
+export const analysisCache = pgTable("analysis_cache", {
+  key: text("key").primaryKey(),
+  result: jsonb("result").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

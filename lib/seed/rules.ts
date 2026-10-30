@@ -110,7 +110,7 @@ export const RULES: RuleDef[] = [
       issue:
         "The advertised APR is lower than the lowest APR ClearPath offers for this product.",
       suggestion:
-        "Advertise only the real range from the product facts, for example 'APRs from 8.99%' for the personal loan, with the APR disclosure.",
+        "Advertise only the rates and terms ClearPath actually offers for this product (see the product facts) and show them with the approved APR disclosure.",
     },
     citation: "12 CFR 1026.24(a); 12 CFR 1026.16(a)",
     guidance:

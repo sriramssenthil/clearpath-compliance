@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
 import { requireRole } from "@/lib/auth";
-import { Placeholder } from "../../_components/placeholder";
+import { NewSubmissionForm } from "@/components/submit/new-submission-form";
+
+// Server actions on this page call the model (5-15 s); allow headroom beyond the host default.
+export const maxDuration = 60;
 
 export const metadata: Metadata = { title: "New submission" };
 
 export default async function NewSubmissionPage() {
-  await requireRole("marketer", "affiliate");
+  const user = await requireRole("marketer", "affiliate");
   return (
-    <Placeholder
-      title="New submission"
-      summary="Will take the asset text plus product, channel, states and launch date, run the automated pre-check, and show cited findings with suggested fixes before you submit."
-    />
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-2xl font-semibold tracking-tight">New submission</h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted">
+          Describe the asset, paste its text and run the pre-check. You will see what compliance would flag, with the exact text and a suggested fix, so you
+          can correct it before anyone reviews it.
+        </p>
+      </header>
+      <NewSubmissionForm userId={user.id} role={user.role} />
+    </div>
   );
 }
