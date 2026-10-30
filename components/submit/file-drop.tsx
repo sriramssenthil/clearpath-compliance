@@ -173,7 +173,7 @@ export function FileDrop({ value, onChange, disabled, kept, onRemoveKept, captur
             {busy ? "Preparing..." : "Choose a file"}
           </Button>
           <p id={hintId} className="text-xs text-muted">
-            PNG, JPEG, WebP, GIF or PDF, up to {formatBytes(MAX_FILE_BYTES)}. Large images are resized in your browser before upload.
+            PNG, JPEG, WebP, GIF, HEIC or PDF, up to {formatBytes(MAX_FILE_BYTES)}. Large images are resized (and HEIC photos converted) in your browser before upload.
           </p>
         </div>
       )}

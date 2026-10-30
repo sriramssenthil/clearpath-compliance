@@ -15,8 +15,12 @@ export type PrepareResult = { ok: true; file: PreparedFile } | { ok: false; erro
 
 async function decode(file: File): Promise<{ source: CanvasImageSource; width: number; height: number; close: () => void }> {
   if ("createImageBitmap" in window) {
-    const bmp = await createImageBitmap(file);
-    return { source: bmp, width: bmp.width, height: bmp.height, close: () => bmp.close() };
+    try {
+      const bmp = await createImageBitmap(file);
+      return { source: bmp, width: bmp.width, height: bmp.height, close: () => bmp.close() };
+    } catch {
+      // Some formats (HEIC in some Safari versions) decode in <img> but not createImageBitmap: fall through.
+    }
   }
   const url = URL.createObjectURL(file);
   const img = new Image();
@@ -27,6 +31,35 @@ async function decode(file: File): Promise<{ source: CanvasImageSource; width: n
 
 function encode(canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob | null> {
   return new Promise((resolve) => canvas.toBlob(resolve, type, quality));
+}
+
+/** HEIC/HEIF (the default for iPhone and Mac Photos): ISO-BMFF "ftyp" box with a HEIF brand. */
+function isHeic(head: Uint8Array, file: File): boolean {
+  const brand = head.length >= 12 && String.fromCharCode(...head.slice(4, 8)) === "ftyp" ? String.fromCharCode(...head.slice(8, 12)) : "";
+  return ["heic", "heix", "hevc", "hevx", "heim", "heis", "mif1", "msf1"].includes(brand) || /\.(heic|heif)$/i.test(file.name) || /image\/hei[cf]/.test(file.type);
+}
+
+/**
+ * Safari (and other browsers with HEIF support) can decode HEIC, so the photo is converted to JPEG here and
+ * the server never has to accept HEIC. Browsers that cannot decode it get a clear export instruction.
+ */
+async function heicToJpeg(input: File): Promise<File | null> {
+  try {
+    const img = await decode(input);
+    try {
+      const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
+      canvas.getContext("2d")!.drawImage(img.source, 0, 0, canvas.width, canvas.height);
+      const blob = await encode(canvas, "image/jpeg", 0.9);
+      return blob ? new File([blob], input.name.replace(/\.(heic|heif)$/i, "") + ".jpg", { type: "image/jpeg" }) : null;
+    } finally {
+      img.close();
+    }
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -42,7 +75,18 @@ export async function prepareFile(input: File): Promise<PrepareResult> {
   } catch {
     /* unreadable: handled below */
   }
-  if (!declared) return { ok: false, error: "That file type is not supported. Upload a PNG, JPEG, WebP or GIF image, or a PDF." };
+  if (!declared) {
+    const head = new Uint8Array(await input.slice(0, 16).arrayBuffer().catch(() => new ArrayBuffer(0)));
+    if (isHeic(head, input)) {
+      const jpeg = await heicToJpeg(input);
+      if (!jpeg) {
+        return { ok: false, error: "This browser cannot read HEIC photos. Open it in Safari, or export it as JPEG first (in Photos: File > Export) and upload that." };
+      }
+      const converted = await prepareFile(jpeg);
+      return converted.ok ? { ok: true, file: { ...converted.file, originalBytes: input.size, note: "Converted from HEIC to JPEG in your browser" } } : converted;
+    }
+    return { ok: false, error: "That file type is not supported. Upload a PNG, JPEG, WebP, GIF or HEIC image, or a PDF." };
+  }
 
   if (isPdf(declared)) {
     const problem = sizeProblem(input.size, declared);

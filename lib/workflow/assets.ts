@@ -15,7 +15,8 @@ export const REENCODE_ABOVE_BYTES = 1.5 * 1024 * 1024;
 export const MAX_IMAGE_SIDE = 2000;
 /** The API rejects images larger than this on either side, so these are always downscaled. */
 export const API_MAX_IMAGE_SIDE = 8000;
-export const ACCEPT_ATTR = ASSET_MEDIA_TYPES.join(",");
+// HEIC is accepted by the picker but converted to JPEG in the browser (components/submit/prepare-file.ts); the server never receives it.
+export const ACCEPT_ATTR = [...ASSET_MEDIA_TYPES, "image/heic", "image/heif", ".heic", ".heif"].join(",");
 
 /**
  * Sits between the file's transcription and the submitter's typed copy in a version's `content`.
