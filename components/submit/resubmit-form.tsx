@@ -10,6 +10,7 @@ import { FileDrop } from "./file-drop";
 import { fileKey, toFormData, type PreparedFile } from "./prepare-file";
 import { CHANNEL_LABEL, MAX_CONTENT, MIN_CONTENT, PRODUCT_LABEL } from "./options";
 import { SubmitBar } from "./submit-bar";
+import { Button } from "@/components/ui/button";
 import { stateName } from "./us-states";
 import { isStale, usePrecheck } from "./use-precheck";
 import { Workspace } from "./workspace";
@@ -166,6 +167,13 @@ export function ResubmitForm({ submissionId, title, product, channel, states, in
         onSubmit={onSubmit}
         onConfirm={() => void send()}
         onCancelConfirm={() => setConfirmOpen(false)}
+        secondary={
+          text.trim() || hasFile ? (
+            <Button variant="secondary" onClick={() => pre.run(text, contextKey)} disabled={pre.phase === "running" || submitting}>
+              {pre.phase === "running" ? "Checking..." : pre.result ? "Re-run pre-check" : "Run pre-check"}
+            </Button>
+          ) : null
+        }
       />
     </div>
   );

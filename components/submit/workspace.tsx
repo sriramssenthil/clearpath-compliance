@@ -122,9 +122,6 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-2">
-      {/* On wide screens the editor stays in view between the header and the sticky submit bar, so its
-          controls (including Re-run pre-check) are never hidden under the bar while the findings scroll. */}
-      <div className="lg:sticky lg:top-[4.5rem] lg:max-h-[calc(100vh-4.5rem-5.5rem)] lg:overflow-y-auto">
       <AssetEditor
         ref={editorRef}
         value={text}
@@ -150,7 +147,6 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
         fileSlot={fileSlot}
         hasFile={hasFile}
       />
-      </div>
       <PrecheckPanel
         pre={pre}
         sorted={sorted}

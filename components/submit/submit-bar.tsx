@@ -17,10 +17,12 @@ interface Props {
   error?: string | null;
   hint?: ReactNode;
   left?: ReactNode;
+  /** Extra action shown before the submit button (e.g. Re-run pre-check), so it is never hidden under the bar. */
+  secondary?: ReactNode;
 }
 
 /** Sticky action bar with a single inline confirmation step (no modal). */
-export function SubmitBar({ label, pendingLabel, submitting, disabled, confirmMessage, onSubmit, onConfirm, onCancelConfirm, error, hint, left }: Props) {
+export function SubmitBar({ label, pendingLabel, submitting, disabled, confirmMessage, onSubmit, onConfirm, onCancelConfirm, error, hint, left, secondary }: Props) {
   return (
     <div className="sticky bottom-0 z-20 -mx-4 border-t border-border bg-surface/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3">
@@ -48,10 +50,13 @@ export function SubmitBar({ label, pendingLabel, submitting, disabled, confirmMe
               </Button>
             </div>
           ) : (
+            <>
+            {secondary}
             <Button onClick={onSubmit} disabled={disabled || submitting}>
               <Send aria-hidden className="size-4" />
               {submitting ? pendingLabel : label}
             </Button>
+            </>
           )}
         </div>
       </div>

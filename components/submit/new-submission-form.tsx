@@ -416,6 +416,13 @@ export function NewSubmissionForm({ userId, role, masters = [] }: { userId: numb
         onSubmit={onSubmit}
         onConfirm={() => void send()}
         onCancelConfirm={() => setConfirmOpen(false)}
+        secondary={
+          f.content.trim() || file ? (
+            <Button variant="secondary" onClick={() => pre.run(f.content, contextKey)} disabled={pre.phase === "running" || submitting}>
+              {pre.phase === "running" ? "Checking..." : pre.result ? "Re-run pre-check" : "Run pre-check"}
+            </Button>
+          ) : null
+        }
         left={
           isBlank(f) ? null : (
             <span className="flex items-center gap-3">
