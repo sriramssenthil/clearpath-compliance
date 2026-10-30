@@ -1,0 +1,13 @@
+{
+  "id": "17-affiliate-commissionable-link",
+  "description": "Influencer social post using only 'commissionable link' as a disclosure.",
+  "product": "credit_card",
+  "channel": "social",
+  "states": [],
+  "isAffiliate": true,
+  "content": "Obsessed with my new ClearPath card! 1.5% cash back on literally everything and the app is so easy to use.\n\nGrab yours here (commissionable link): https://clearpath.example/card?ref=ig_mia\n\n#creditcards #cashback #moneytips",
+  "expectedRuleCodes": [
+    "FTC-AFFILIATE"
+  ],
+  "notes": "The only disclosure is 'commissionable link', which the catalog treats as inadequate: it does not tell an ordinary reader the poster is paid. No #ad, 'paid link' or 'sponsored' wording is present."
+}

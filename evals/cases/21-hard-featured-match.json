@@ -1,0 +1,17 @@
+{
+  "id": "21-hard-featured-match",
+  "description": "Affiliate page with a good disclosure that still steers every reader to one lender.",
+  "product": "personal_loan",
+  "channel": "affiliate_page",
+  "states": [],
+  "isAffiliate": true,
+  "content": "Disclosure: We are paid by the lenders featured on this page.\n\nFind your match\n\nTell us about your goals and we will match you with a lender. Whether your credit score is 580 or 780, whether you want $3,000 or $30,000, and whatever you plan to use the money for, our featured match is the same: ClearPath Personal Loans.\n\nClearPath offers 8.99% to 35.99% APR, depending on your credit profile. Check your rate with a soft pull. See your featured match: https://clearpath.example/apply?partner=loanlens\n\nTerms apply.",
+  "expectedRuleCodes": [
+    "CFPB-STEERING"
+  ],
+  "mustNotFlag": [
+    "FTC-AFFILIATE",
+    "UDAAP-SUPERLATIVE"
+  ],
+  "notes": "Hard because the paid-links disclosure is present and 'featured' is mild. Defensible as steering: the page pretends to match on fit but returns the same lender for every score, amount and purpose, so the placement can only be explained by compensation (CFPB Circular 2024-01). Not flagged for FTC-AFFILIATE or a superlative."
+}

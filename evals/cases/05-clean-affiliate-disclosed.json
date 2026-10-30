@@ -1,0 +1,16 @@
+{
+  "id": "05-clean-affiliate-disclosed",
+  "description": "Affiliate loan comparison with a clear paid-link disclosure and a stated basis for ranking.",
+  "product": "personal_loan",
+  "channel": "affiliate_page",
+  "states": [],
+  "isAffiliate": true,
+  "content": "Advertising disclosure: This page contains paid links. Lenders compensate us when you click through and apply, which may influence where an offer appears on this page. It does not change the lender's terms or what you pay.\n\nHow to compare personal loans\n\nWhen we compare lenders we look at the same three things: the APR range, the fees, and how quickly funds arrive. Here is what the published terms look like for ClearPath Personal Loans.\n\n- APR: 8.99% to 35.99% APR, depending on your credit profile\n- Amounts: $2,000 to $50,000\n- Terms: 24 to 60 months\n- Fees: origination fee of 0% to 8% may apply\n- Rate check: soft credit pull, no impact to your credit score\n\nIf you carry balances on several cards, compare your current APR against the range above before you apply, and check offers from more than one lender. Apply with ClearPath (paid link): https://clearpath.example/apply?partner=loanlens\n\nTerms apply.",
+  "expectedRuleCodes": [],
+  "mustNotFlag": [
+    "FTC-AFFILIATE",
+    "CFPB-STEERING",
+    "REGZ-24-APR"
+  ],
+  "notes": "Affiliate content with every check satisfied: a prominent 'paid links' disclosure, a basis for the listing, labelled APR range and no superlatives or approval promises."
+}

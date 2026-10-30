@@ -1,0 +1,14 @@
+{
+  "id": "10-payment-terms-simple-rate",
+  "description": "Display ad with payment amount and count plus a rate not labelled APR.",
+  "product": "personal_loan",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Wipe out your card balances with 60 monthly payments of $249 at a low 9.9% rate. Apply in minutes with ClearPath.",
+  "expectedRuleCodes": [
+    "REGZ-24-TRIGGER",
+    "REGZ-24-APR"
+  ],
+  "notes": "Payment amount and number of payments are triggering terms that need the APR and full repayment terms; the 9.9% is a simple rate with no APR beside it."
+}

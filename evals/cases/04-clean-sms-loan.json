@@ -1,0 +1,14 @@
+{
+  "id": "04-clean-sms-loan",
+  "description": "Loan SMS with brand ID, APR range, soft pull and STOP language.",
+  "product": "personal_loan",
+  "channel": "sms",
+  "states": [],
+  "isAffiliate": false,
+  "content": "ClearPath: Maria, your rate check is ready. See personal loan options at 8.99%-35.99% APR with a soft pull that won't affect your credit score: https://clearpath.example/r/k29d Reply STOP to opt out, HELP for help. Msg&data rates may apply.",
+  "expectedRuleCodes": [],
+  "mustNotFlag": [
+    "SMS-OPTOUT",
+    "REGZ-24-APR"
+  ]
+}

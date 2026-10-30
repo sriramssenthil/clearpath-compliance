@@ -1,0 +1,14 @@
+{
+  "id": "24-hard-builds-credit-email",
+  "description": "Loan email claiming to build credit, with no unsubscribe or postal address.",
+  "product": "personal_loan",
+  "channel": "email",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Subject: Build your credit with ClearPath\n\nHi there,\n\nA ClearPath Personal Loan can help you build your credit score, one on-time payment at a time. Rates 8.99% to 35.99% APR, based on your credit profile. Checking your rate uses a soft pull.\n\nSee your options: https://clearpath.example/rates\n\nTerms apply.",
+  "expectedRuleCodes": [
+    "UDAAP-APR",
+    "EMAIL-CANSPAM"
+  ],
+  "notes": "Hard because UDAAP-APR is an AI judgment about an unsubstantiated 'builds credit' claim: it could be substantiated if ClearPath reports to the bureaus, but nothing in the asset or the product facts says so. EMAIL-CANSPAM is deterministic: no unsubscribe link or postal address."
+}

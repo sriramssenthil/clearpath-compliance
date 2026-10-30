@@ -1,0 +1,12 @@
+{
+  "id": "07-guarantee-explicit",
+  "description": "Loan display ad promising guaranteed approval.",
+  "product": "personal_loan",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Guaranteed approval on ClearPath Personal Loans.\n\nBorrow $2,000 to $50,000 with rates from 8.99% to 35.99% APR. Apply in minutes from your phone. Terms apply.",
+  "expectedRuleCodes": [
+    "UDAAP-GUARANTEE"
+  ]
+}

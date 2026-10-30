@@ -1,0 +1,470 @@
+{
+  "rulesOnly": false,
+  "runs": [
+    {
+      "id": "01-clean-card-intro-full",
+      "expected": [],
+      "found": [],
+      "mustNotFlag": [
+        "REGZ-16-TRIGGER",
+        "REGZ-16-INTRO",
+        "REGZ-16-DEFERRED",
+        "UDAAP-APR"
+      ],
+      "latencyMs": 3377,
+      "costUsd": 0.041791,
+      "droppedAi": 0
+    },
+    {
+      "id": "02-clean-loan-labelled-apr",
+      "expected": [],
+      "found": [],
+      "mustNotFlag": [
+        "REGZ-24-APR",
+        "REGZ-24-TRIGGER",
+        "REGZ-24-AVAIL",
+        "UDAAP-APR"
+      ],
+      "latencyMs": 6416,
+      "costUsd": 0.047177,
+      "droppedAi": 0
+    },
+    {
+      "id": "03-clean-mortgage-email",
+      "expected": [],
+      "found": [],
+      "mustNotFlag": [
+        "FCRA-PREQUAL",
+        "MORT-NMLS",
+        "MORT-EHL",
+        "EMAIL-CANSPAM"
+      ],
+      "latencyMs": 5798,
+      "costUsd": 0.047395,
+      "droppedAi": 0
+    },
+    {
+      "id": "04-clean-sms-loan",
+      "expected": [],
+      "found": [],
+      "mustNotFlag": [
+        "SMS-OPTOUT",
+        "REGZ-24-APR"
+      ],
+      "latencyMs": 3559,
+      "costUsd": 0.040461,
+      "droppedAi": 0
+    },
+    {
+      "id": "05-clean-affiliate-disclosed",
+      "expected": [],
+      "found": [
+        "REGZ-24-TRIGGER"
+      ],
+      "mustNotFlag": [
+        "FTC-AFFILIATE",
+        "CFPB-STEERING",
+        "REGZ-24-APR"
+      ],
+      "latencyMs": 10201,
+      "costUsd": 0.060092,
+      "droppedAi": 0
+    },
+    {
+      "id": "06-clean-warning-post",
+      "expected": [],
+      "found": [
+        "UDAAP-GUARANTEE"
+      ],
+      "mustNotFlag": [
+        "UDAAP-GUARANTEE"
+      ],
+      "latencyMs": 3974,
+      "costUsd": 0.043824,
+      "droppedAi": 0
+    },
+    {
+      "id": "07-guarantee-explicit",
+      "expected": [
+        "UDAAP-GUARANTEE"
+      ],
+      "found": [
+        "UDAAP-GUARANTEE"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 3838,
+      "costUsd": 0.0092634,
+      "droppedAi": 1
+    },
+    {
+      "id": "08-guarantee-implied",
+      "expected": [
+        "UDAAP-GUARANTEE"
+      ],
+      "found": [
+        "UDAAP-GUARANTEE"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 5631,
+      "costUsd": 0.0129824,
+      "droppedAi": 1
+    },
+    {
+      "id": "09-rate-below-floor-over-max",
+      "expected": [
+        "REGZ-24-APR",
+        "REGZ-24-AVAIL"
+      ],
+      "found": [
+        "REGZ-24-APR",
+        "REGZ-24-AVAIL",
+        "UDAAP-APR"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 13519,
+      "costUsd": 0.030543400000000002,
+      "droppedAi": 2
+    },
+    {
+      "id": "10-payment-terms-simple-rate",
+      "expected": [
+        "REGZ-24-TRIGGER",
+        "REGZ-24-APR"
+      ],
+      "found": [
+        "REGZ-24-APR",
+        "REGZ-24-TRIGGER"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 11930,
+      "costUsd": 0.0258794,
+      "droppedAi": 2
+    },
+    {
+      "id": "11-card-promo-no-golto",
+      "expected": [
+        "REGZ-16-TRIGGER",
+        "REGZ-16-INTRO"
+      ],
+      "found": [
+        "REGZ-16-INTRO",
+        "REGZ-16-TRIGGER"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 6756,
+      "costUsd": 0.016430200000000002,
+      "droppedAi": 0
+    },
+    {
+      "id": "12-no-interest-until",
+      "expected": [
+        "REGZ-16-DEFERRED",
+        "REGZ-16-TRIGGER"
+      ],
+      "found": [
+        "REGZ-16-DEFERRED",
+        "REGZ-16-INTRO",
+        "REGZ-16-TRIGGER"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 10377,
+      "costUsd": 0.061558,
+      "droppedAi": 1
+    },
+    {
+      "id": "13-preapproved-best-rates",
+      "expected": [
+        "FCRA-PREQUAL",
+        "UDAAP-SUPERLATIVE"
+      ],
+      "found": [
+        "FCRA-PREQUAL",
+        "UDAAP-SUPERLATIVE"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 5122,
+      "costUsd": 0.0116994,
+      "droppedAi": 2
+    },
+    {
+      "id": "14-already-approved-paraphrase",
+      "expected": [
+        "FCRA-PREQUAL"
+      ],
+      "found": [
+        "FCRA-PREQUAL"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 6450,
+      "costUsd": 0.014726399999999999,
+      "droppedAi": 0
+    },
+    {
+      "id": "15-prescreen-no-optout-email",
+      "expected": [
+        "FCRA-PRESCREEN"
+      ],
+      "found": [
+        "FCRA-PREQUAL",
+        "FCRA-PRESCREEN"
+      ],
+      "mustNotFlag": [
+        "EMAIL-CANSPAM",
+        "FCRA-PREQUAL"
+      ],
+      "latencyMs": 11767,
+      "costUsd": 0.027326200000000002,
+      "droppedAi": 0
+    },
+    {
+      "id": "16-affiliate-no-disclosure",
+      "expected": [
+        "FTC-AFFILIATE"
+      ],
+      "found": [
+        "FTC-AFFILIATE",
+        "UDAAP-APR"
+      ],
+      "mustNotFlag": [
+        "CFPB-STEERING",
+        "UDAAP-SUPERLATIVE",
+        "REGZ-24-APR"
+      ],
+      "latencyMs": 9456,
+      "costUsd": 0.021073599999999998,
+      "droppedAi": 0
+    },
+    {
+      "id": "17-affiliate-commissionable-link",
+      "expected": [
+        "FTC-AFFILIATE"
+      ],
+      "found": [
+        "FTC-AFFILIATE"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 8079,
+      "costUsd": 0.016145200000000002,
+      "droppedAi": 0
+    },
+    {
+      "id": "18-injection-system-override",
+      "expected": [
+        "SEC-INJECTION"
+      ],
+      "found": [
+        "SEC-INJECTION"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 5758,
+      "costUsd": 0.0143194,
+      "droppedAi": 1
+    },
+    {
+      "id": "19-ecoa-discourage",
+      "expected": [
+        "ECOA-DISCOURAGE"
+      ],
+      "found": [
+        "ECOA-DISCOURAGE"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 5975,
+      "costUsd": 0.0137104,
+      "droppedAi": 0
+    },
+    {
+      "id": "20-sms-ca-no-optout-license",
+      "expected": [
+        "SMS-OPTOUT",
+        "STATE-CA-CFL"
+      ],
+      "found": [
+        "SMS-OPTOUT",
+        "STATE-CA-CFL",
+        "UDAAP-APR"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 6715,
+      "costUsd": 0.0153314,
+      "droppedAi": 0
+    },
+    {
+      "id": "21-hard-featured-match",
+      "expected": [
+        "CFPB-STEERING"
+      ],
+      "found": [
+        "CFPB-STEERING"
+      ],
+      "mustNotFlag": [
+        "FTC-AFFILIATE",
+        "UDAAP-SUPERLATIVE"
+      ],
+      "latencyMs": 7710,
+      "costUsd": 0.0175016,
+      "droppedAi": 0
+    },
+    {
+      "id": "22-hard-fixed-arm",
+      "expected": [
+        "REGZ-24-MORTGAGE",
+        "MORT-NMLS",
+        "MORT-EHL"
+      ],
+      "found": [
+        "MORT-EHL",
+        "MORT-NMLS",
+        "REGZ-24-MORTGAGE"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 6120,
+      "costUsd": 0.013548600000000001,
+      "droppedAi": 0
+    },
+    {
+      "id": "23-hard-polite-injection",
+      "expected": [
+        "SEC-INJECTION"
+      ],
+      "found": [
+        "SEC-INJECTION"
+      ],
+      "mustNotFlag": [
+        "EMAIL-CANSPAM",
+        "FCRA-PREQUAL"
+      ],
+      "latencyMs": 6098,
+      "costUsd": 0.0136634,
+      "droppedAi": 0
+    },
+    {
+      "id": "24-hard-builds-credit-email",
+      "expected": [
+        "UDAAP-APR",
+        "EMAIL-CANSPAM"
+      ],
+      "found": [
+        "EMAIL-CANSPAM",
+        "UDAAP-APR"
+      ],
+      "mustNotFlag": [],
+      "latencyMs": 7974,
+      "costUsd": 0.0178314,
+      "droppedAi": 0
+    }
+  ],
+  "perRule": {
+    "REGZ-24-TRIGGER": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 0
+    },
+    "REGZ-24-APR": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "REGZ-24-AVAIL": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "REGZ-24-MORTGAGE": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "REGZ-16-TRIGGER": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "REGZ-16-INTRO": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 0
+    },
+    "REGZ-16-DEFERRED": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "UDAAP-APR": {
+      "tp": 1,
+      "fp": 3,
+      "fn": 0
+    },
+    "UDAAP-GUARANTEE": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 0
+    },
+    "UDAAP-SUPERLATIVE": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "FCRA-PREQUAL": {
+      "tp": 2,
+      "fp": 1,
+      "fn": 0
+    },
+    "FCRA-PRESCREEN": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "FTC-AFFILIATE": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    },
+    "ECOA-DISCOURAGE": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "STATE-CA-CFL": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "MORT-NMLS": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "MORT-EHL": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "CFPB-STEERING": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "EMAIL-CANSPAM": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "SMS-OPTOUT": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "SEC-INJECTION": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 0
+    }
+  },
+  "summary": {
+    "TP": 27,
+    "FP": 7,
+    "FN": 0,
+    "cost": 0.6342738
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "02-clean-loan-labelled-apr",
+  "description": "Loan ad quoting rates and a payment, with APR labelled and a representative example.",
+  "product": "personal_loan",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Pay off your cards with one ClearPath Personal Loan.\n\nRates start at 8.99% APR and go up to 35.99% APR, based on your credit profile. Loan amounts from $2,000 to $50,000, terms from 24 to 60 months.\n\nRepresentative example: a $15,000 loan over 48 months at 10.99% APR has a monthly payment of $387.61 and a total repayment of $18,605.28. Example assumes no origination fee; fees of 0% to 8% may apply.\n\nChecking your rate uses a soft credit pull and will not affect your credit score. Terms apply.",
+  "expectedRuleCodes": [],
+  "mustNotFlag": [
+    "REGZ-24-APR",
+    "REGZ-24-TRIGGER",
+    "REGZ-24-AVAIL",
+    "UDAAP-APR"
+  ],
+  "notes": "Mentions a rate, a monthly payment and a term (all Reg Z triggering terms) but pairs them with the labelled APR and repayment terms, and stays inside the product facts (8.99%-35.99%, $2,000-$50,000, 24-60 months)."
+}

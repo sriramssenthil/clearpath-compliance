@@ -1,0 +1,14 @@
+{
+  "id": "09-rate-below-floor-over-max",
+  "description": "Display ad quoting a simple rate under the floor and a loan amount over the maximum.",
+  "product": "personal_loan",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Consolidate and save! ClearPath personal loans from just 4.5% interest. Borrow up to $100,000. Apply today.",
+  "expectedRuleCodes": [
+    "REGZ-24-APR",
+    "REGZ-24-AVAIL"
+  ],
+  "notes": "4.5% is below the 8.99% APR floor and $100,000 exceeds the $50,000 maximum (REGZ-24-AVAIL). The rate is a simple 'interest' rate with no APR (REGZ-24-APR). A UDAAP-APR flag would be defensible but is overlapping, so it is not required."
+}

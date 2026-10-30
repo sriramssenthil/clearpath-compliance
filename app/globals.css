@@ -1,26 +1,171 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens. Light is primary; dark follows prefers-color-scheme.
+ * Surfaces are neutral slate, one indigo accent, and six semantic tones (each with fg / soft / line)
+ * that severity and status colors are built from.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  color-scheme: light dark;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --background: #f5f6f8;
+  --surface: #ffffff;
+  --surface-muted: #eff1f5;
+  --border: #e1e5ec;
+  --border-strong: #c7cedb;
+  --foreground: #0f172a;
+  --muted: #475569;
+  --subtle: #586478;
+
+  --accent: #4338ca;
+  --accent-hover: #3730a3;
+  --accent-foreground: #ffffff;
+  --accent-soft: #eef0ff;
+  --accent-line: #c7cbfb;
+  --ring: #6366f1;
+
+  --danger: #b42318;
+  --danger-soft: #fef3f2;
+  --danger-line: #fecdca;
+  --warning: #93370d;
+  --warning-soft: #fffaeb;
+  --warning-line: #fedf89;
+  --info: #175cd3;
+  --info-soft: #eff8ff;
+  --info-line: #b2ddff;
+  --success: #067647;
+  --success-soft: #ecfdf3;
+  --success-line: #abefc6;
+  --neutral: #344054;
+  --neutral-soft: #f2f4f7;
+  --neutral-line: #d0d5dd;
+
+  /* Highlight for quoted text inside submitted content. */
+  --mark: #fde68a;
+  --mark-foreground: #1f2937;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0e17;
+    --surface: #111827;
+    --surface-muted: #182032;
+    --border: #243049;
+    --border-strong: #35435f;
+    --foreground: #e7ebf3;
+    --muted: #a9b4c8;
+    --subtle: #8793ab;
+
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+    --accent-foreground: #0a0e17;
+    --accent-soft: #1b2145;
+    --accent-line: #343f85;
+    --ring: #a5b4fc;
+
+    --danger: #fda29b;
+    --danger-soft: #2b1416;
+    --danger-line: #6b2a2e;
+    --warning: #fec84b;
+    --warning-soft: #2a2010;
+    --warning-line: #6b4e12;
+    --info: #84caff;
+    --info-soft: #0f2038;
+    --info-line: #1f4b80;
+    --success: #75e0a7;
+    --success-soft: #0d2a1d;
+    --success-line: #1c5a3b;
+    --neutral: #cbd2e0;
+    --neutral-soft: #1a2233;
+    --neutral-line: #2f3b55;
+
+    --mark: #5c4a0b;
+    --mark-foreground: #fef3c7;
   }
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+  --color-ring: var(--ring);
+
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-line: var(--danger-line);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-line: var(--warning-line);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-line: var(--info-line);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-line: var(--success-line);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-neutral-line: var(--neutral-line);
+
+  /* Severity aliases: high = danger, medium = warning, low = info. */
+  --color-sev-high: var(--danger);
+  --color-sev-high-soft: var(--danger-soft);
+  --color-sev-high-line: var(--danger-line);
+  --color-sev-medium: var(--warning);
+  --color-sev-medium-soft: var(--warning-soft);
+  --color-sev-medium-line: var(--warning-line);
+  --color-sev-low: var(--info);
+  --color-sev-low-soft: var(--info-soft);
+  --color-sev-low-line: var(--info-line);
+
+  --color-mark: var(--mark);
+  --color-mark-foreground: var(--mark-foreground);
+
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04), 0 1px 1px rgb(15 23 42 / 0.03);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent-line);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

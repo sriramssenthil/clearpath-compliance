@@ -1,0 +1,15 @@
+{
+  "id": "22-hard-fixed-arm",
+  "description": "Mortgage ad that calls a 5/1 ARM payment fixed 'for the life of the loan' and omits NMLS and EHL.",
+  "product": "mortgage_prequal",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Love your payment, keep it. Our 5/1 ARM keeps your payment the same for the life of your loan, with no surprises.\n\nGet prequalified in minutes with a soft credit pull. Not a commitment to lend.",
+  "expectedRuleCodes": [
+    "REGZ-24-MORTGAGE",
+    "MORT-NMLS",
+    "MORT-EHL"
+  ],
+  "notes": "Hard because the word 'fixed' never appears: 'same for the life of your loan' is a paraphrase of a fixed-rate claim for an adjustable-rate product, which is the misleading-rate claim REGZ-24-MORTGAGE targets. NMLS and EHL are plainly missing. No rate, payment amount or term is quoted, so no triggering-term finding."
+}

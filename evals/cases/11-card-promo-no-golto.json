@@ -1,0 +1,14 @@
+{
+  "id": "11-card-promo-no-golto",
+  "description": "Display ad promoting 0% APR for 15 months with no go-to rate or intro wording.",
+  "product": "credit_card",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Enjoy 0% APR for 15 months on every purchase with the ClearPath Cash Back Card. Get yours today.",
+  "expectedRuleCodes": [
+    "REGZ-16-TRIGGER",
+    "REGZ-16-INTRO"
+  ],
+  "notes": "15 months matches the product facts, so this is not an availability problem. The ad states an APR with no variable-rate or fee disclosure, and the promotional rate has no 'introductory' label or go-to APR."
+}

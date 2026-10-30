@@ -1,0 +1,14 @@
+{
+  "id": "06-clean-warning-post",
+  "description": "Educational social post that quotes 'guaranteed approval' only to warn against it.",
+  "product": "personal_loan",
+  "channel": "social",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Seeing ads for \"guaranteed approval\" or \"no credit check\" loans? Treat them as a red flag. No responsible lender can promise approval before looking at your application.\n\nAt ClearPath, you can check your rate with a soft credit pull, and every decision is based on your application. Personal loans from 8.99% to 35.99% APR. Terms apply.",
+  "expectedRuleCodes": [],
+  "mustNotFlag": [
+    "UDAAP-GUARANTEE"
+  ],
+  "notes": "Contains two phrases a regex layer will flag, but the copy warns consumers against them and makes no such promise. The AI step should recognise the context and a reviewer should be able to dismiss a phrase-layer hit."
+}

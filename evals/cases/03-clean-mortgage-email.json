@@ -1,0 +1,17 @@
+{
+  "id": "03-clean-mortgage-email",
+  "description": "Mortgage prequalification email with NMLS ID, Equal Housing Lender, unsubscribe and postal address.",
+  "product": "mortgage_prequal",
+  "channel": "email",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Subject: See what you could prequalify for\n\nHi Jordan,\n\nThinking about buying or refinancing? You can find out where you stand in a few minutes. Get prequalified with ClearPath Home Lending and see your estimated options, with no obligation.\n\nPrequalification uses a soft credit pull, so it will not affect your credit score. It is an estimate based on the information you provide, not a commitment to lend, and your terms may change once you submit a full application and we verify your details.\n\nStart your prequalification: https://clearpath.example/home/start\n\nSincerely,\nThe ClearPath Home Lending Team\nNMLS ID 2114468 | Equal Housing Lender\n\nClearPath Financial, 400 Market Street, Suite 900, San Francisco, CA 94111\nYou are receiving this email because you asked for mortgage updates. Unsubscribe: https://clearpath.example/unsubscribe",
+  "expectedRuleCodes": [],
+  "mustNotFlag": [
+    "FCRA-PREQUAL",
+    "MORT-NMLS",
+    "MORT-EHL",
+    "EMAIL-CANSPAM"
+  ],
+  "notes": "Uses 'prequalified' (correct for a statement-based estimate), not 'pre-approved'. Contains every required mortgage and email element. No rates or payments are quoted, so no Reg Z triggering terms."
+}

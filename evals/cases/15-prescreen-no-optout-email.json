@@ -1,0 +1,17 @@
+{
+  "id": "15-prescreen-no-optout-email",
+  "description": "Prescreened card email that omits the opt-out notice.",
+  "product": "credit_card",
+  "channel": "email",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Subject: You've been selected\n\nDear Taylor,\n\nYou've been selected! Based on information from your credit report, you were prescreened for the ClearPath Cash Back Card. If you apply and meet our criteria, you will receive a firm offer of credit.\n\nEarn 1.5% cash back on every purchase. Learn more at clearpath.example/card. Terms apply.\n\nClearPath Financial, 400 Market Street, Suite 900, San Francisco, CA 94111\nTo stop receiving marketing emails, unsubscribe here: https://clearpath.example/unsubscribe",
+  "expectedRuleCodes": [
+    "FCRA-PRESCREEN"
+  ],
+  "mustNotFlag": [
+    "EMAIL-CANSPAM",
+    "FCRA-PREQUAL"
+  ],
+  "notes": "A genuine prescreened offer, so 'selected' is not an FCRA-PREQUAL problem, but it lacks the prescreen opt-out notice. The email unsubscribe is for marketing emails, not the consumer-reporting-agency opt-out."
+}

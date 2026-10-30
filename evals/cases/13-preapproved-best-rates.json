@@ -1,0 +1,14 @@
+{
+  "id": "13-preapproved-best-rates",
+  "description": "Loan ad claiming pre-approval and the best rates around.",
+  "product": "personal_loan",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "You're pre-approved! Claim your ClearPath personal loan today at the best rates around.\n\nRates 8.99%-35.99% APR. Terms apply.",
+  "expectedRuleCodes": [
+    "FCRA-PREQUAL",
+    "UDAAP-SUPERLATIVE"
+  ],
+  "notes": "The ad is not a prescreened firm offer (no mention of one or of an opt-out), so 'pre-approved' misdescribes an estimate. 'Best rates around' is an unsubstantiated superlative."
+}

@@ -1,0 +1,17 @@
+{
+  "id": "01-clean-card-intro-full",
+  "description": "Credit card display ad with 0% intro APR, no annual fee and cash back, fully disclosed.",
+  "product": "credit_card",
+  "channel": "display",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Earn 1.5% cash back on every purchase with the ClearPath Cash Back Card.\n\nEnjoy a 0% introductory APR on purchases for 15 months, then a 20.24%-29.99% variable APR based on your creditworthiness. $0 annual fee. A 3% fee applies to balance transfers.\n\nSee rates, fees and full terms at clearpath.example/card. Terms apply.",
+  "expectedRuleCodes": [],
+  "mustNotFlag": [
+    "REGZ-16-TRIGGER",
+    "REGZ-16-INTRO",
+    "REGZ-16-DEFERRED",
+    "UDAAP-APR"
+  ],
+  "notes": "Looks risky (0%, 'annual fee', cash back) but the intro period, go-to variable APR and fees are all stated next to the first mention. Tests false positives on a correctly disclosed promotion."
+}

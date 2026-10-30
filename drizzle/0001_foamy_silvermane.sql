@@ -1,0 +1,1 @@
+ALTER TABLE "rules" ADD COLUMN "ai_review" boolean DEFAULT true NOT NULL;

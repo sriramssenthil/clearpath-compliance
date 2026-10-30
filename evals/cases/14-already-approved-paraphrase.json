@@ -1,0 +1,13 @@
+{
+  "id": "14-already-approved-paraphrase",
+  "description": "Social post saying a named person's loan is 'already approved'.",
+  "product": "personal_loan",
+  "channel": "social",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Congratulations Alex! Your $15,000 ClearPath loan is already approved and waiting for you. Tap to claim it.\n\nRates 8.99%-35.99% APR. Terms apply.",
+  "expectedRuleCodes": [
+    "FCRA-PREQUAL"
+  ],
+  "notes": "Approval language without an application or a prescreen. Without the phrase 'pre-approved' a regex misses it. UDAAP-GUARANTEE could also be argued; reviewers may differ, so only FCRA-PREQUAL is expected."
+}

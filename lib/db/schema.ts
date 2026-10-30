@@ -144,6 +144,7 @@ export const rules = pgTable("rules", {
   citation: text("citation").notNull(),
   guidance: text("guidance").notNull(),
   enabled: boolean("enabled").notNull().default(true),
+  aiReview: boolean("ai_review").notNull().default(true),
   version: integer("version").notNull().default(1),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

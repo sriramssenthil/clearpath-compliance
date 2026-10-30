@@ -1,0 +1,16 @@
+{
+  "id": "20-sms-ca-no-optout-license",
+  "description": "California-targeted loan SMS missing both opt-out language and the license statement.",
+  "product": "personal_loan",
+  "channel": "sms",
+  "states": [
+    "CA"
+  ],
+  "isAffiliate": false,
+  "content": "ClearPath Loans: Hi Dana, check your rate in 2 minutes. 8.99%-35.99% APR, soft pull only. https://clearpath.example/r/p71x",
+  "expectedRuleCodes": [
+    "SMS-OPTOUT",
+    "STATE-CA-CFL"
+  ],
+  "notes": "Brand ID is present but there is no STOP language. The ad targets California and has no California Financing Law license statement; a short text still needs one or a link that carries it."
+}

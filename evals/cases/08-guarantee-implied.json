@@ -1,0 +1,13 @@
+{
+  "id": "08-guarantee-implied",
+  "description": "Social loan post that promises approval without using the standard phrases.",
+  "product": "personal_loan",
+  "channel": "social",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Bad credit? Been turned down before? Not here. Everyone gets approved at ClearPath, because you simply can't be turned down.\n\nPersonal loans at 8.99%-35.99% APR. Terms apply.",
+  "expectedRuleCodes": [
+    "UDAAP-GUARANTEE"
+  ],
+  "notes": "Paraphrased absolute ('everyone gets approved', 'can't be turned down'); none of the usual trigger phrases appear, so only semantic review catches it."
+}

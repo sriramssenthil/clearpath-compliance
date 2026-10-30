@@ -1,0 +1,13 @@
+{
+  "id": "19-ecoa-discourage",
+  "description": "Social post steering away older and married applicants.",
+  "product": "personal_loan",
+  "channel": "social",
+  "states": [],
+  "isAffiliate": false,
+  "content": "ClearPath loans are built for young, single professionals just starting out. Families and retirees, we suggest looking elsewhere.\n\nPersonal loans at 8.99%-35.99% APR. Terms apply.",
+  "expectedRuleCodes": [
+    "ECOA-DISCOURAGE"
+  ],
+  "notes": "Targets by age and marital status and tells other groups to look elsewhere, which would discourage a reasonable person from applying on a prohibited basis."
+}

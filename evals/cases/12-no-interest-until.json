@@ -1,0 +1,14 @@
+{
+  "id": "12-no-interest-until",
+  "description": "Social post offering no interest until a date, without deferred-interest wording.",
+  "product": "credit_card",
+  "channel": "social",
+  "states": [],
+  "isAffiliate": false,
+  "content": "Shop now, pay later: no interest until January on everything you buy with the ClearPath Cash Back Card.",
+  "expectedRuleCodes": [
+    "REGZ-16-DEFERRED",
+    "REGZ-16-TRIGGER"
+  ],
+  "notes": "'No interest until...' is both a named open-end triggering term (no APR or fee disclosure follows) and a 'no interest' offer missing the 'if paid in full within N months' and interest-from-purchase-date wording."
+}

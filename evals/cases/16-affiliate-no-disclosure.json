@@ -1,0 +1,18 @@
+{
+  "id": "16-affiliate-no-disclosure",
+  "description": "Affiliate loan-comparison post with no disclosure of the commission.",
+  "product": "personal_loan",
+  "channel": "affiliate_page",
+  "states": [],
+  "isAffiliate": true,
+  "content": "Is a personal loan the right way to pay off your credit cards?\n\nIf you carry balances on three or four cards, a single fixed-payment loan can simplify things. ClearPath Personal Loans range from $2,000 to $50,000 with APRs of 8.99% to 35.99%, depending on your credit profile. Checking your rate takes a soft pull, so there is no impact to your credit score.\n\nBefore you apply, compare the loan's APR against the average rate on your cards, and read the fee schedule: origination fees of 0% to 8% may apply.\n\nReady to see your rate? Check your rate with ClearPath: https://clearpath.example/apply?partner=loanlens&subid=post-118\n\nTerms apply.",
+  "expectedRuleCodes": [
+    "FTC-AFFILIATE"
+  ],
+  "mustNotFlag": [
+    "CFPB-STEERING",
+    "UDAAP-SUPERLATIVE",
+    "REGZ-24-APR"
+  ],
+  "notes": "Otherwise careful copy. The only defect is the tracked partner link with no statement that the publisher earns a commission."
+}
