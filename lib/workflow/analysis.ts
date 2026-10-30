@@ -7,6 +7,7 @@ import { computeRisk, recommend } from "@/lib/compliance/risk";
 import type { AssetContext, RuleDef } from "@/lib/compliance/types";
 import { loadFacts, loadRules } from "@/lib/data/reference";
 import { db, tables } from "@/lib/db";
+import { reserveAiCall } from "./budget";
 import type { RuleInfo } from "./types";
 
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
@@ -47,7 +48,7 @@ function cacheKey(ctx: AssetContext, rules: RuleDef[], facts: unknown): string {
  * text was already analysed under the same rules. Only complete (rules + AI) results are cached, so
  * a transient AI outage is never frozen in. Risk is always recomputed with the partner's record.
  */
-export async function analyzeForSubmission(ctx: AssetContext, partnerId: number | null) {
+export async function analyzeForSubmission(ctx: AssetContext, partnerId: number | null, userId: number | null = null) {
   const [rules, facts, rate] = await Promise.all([loadRules(), loadFacts(ctx.product), partnerRejectionRate(partnerId)]);
   const key = cacheKey(ctx, rules, facts);
 
@@ -56,7 +57,8 @@ export async function analyzeForSubmission(ctx: AssetContext, partnerId: number 
   if (hit) result = hit.result as EngineResult;
 
   if (!result) {
-    result = await analyzeAsset(ctx, { rules, facts });
+    const budget = await reserveAiCall(userId);
+    result = await analyzeAsset(ctx, { rules, facts, skipAi: !budget.ok, skipReason: budget.ok ? undefined : budget.reason });
     if (result.status === "complete") {
       await db
         .insert(tables.analysisCache)

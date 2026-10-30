@@ -177,3 +177,14 @@ export const analysisCache = pgTable("analysis_cache", {
   result: jsonb("result").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// One row per live model call, used to cap spend on the public demo (see lib/workflow/budget.ts).
+export const aiUsage = pgTable(
+  "ai_usage",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("ai_usage_created_idx").on(t.createdAt)],
+);

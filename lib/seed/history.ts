@@ -1739,6 +1739,7 @@ function aiToFinding(spec: Spec, vNum: number, content: string, a: AiSpec, sourc
 function summarize(findings: FindingM[], withAi: boolean, engineSummary: string): string {
   if (!withAi) return engineSummary;
   const n = findings.length;
+  if (n === 0) return "No issues found by rule checks or model review.";
   const high = findings.filter((f) => f.severity === "high").length;
   const lead = findings.find((f) => f.severity === "high") ?? findings[0];
   return `Flagged ${n} issue${n === 1 ? "" : "s"} (${high} high severity) across rule checks and model review, led by ${lead.ruleCode}.`;
@@ -1885,7 +1886,7 @@ async function realize(spec: Spec, index: number, env: Env): Promise<SubM> {
       content: vs.content,
       createdAt: new Date(0),
       findings: [],
-      analysisStatus: vs.ai?.length ? "complete" : "rules_only",
+      analysisStatus: "complete", // in the demo story the model reviewed every version
       summary: "",
       riskScore: 0,
       riskLevel: "low",

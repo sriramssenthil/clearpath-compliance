@@ -96,7 +96,7 @@ const ctxOf = (sub: { product: AssetContext["product"]; channel: AssetContext["c
 export async function precheck(actor: Actor, raw: PrecheckInput): Promise<PrecheckResult> {
   const input = parse(submissionSchema.pick({ product: true, channel: true, states: true, content: true }), raw);
   const ctx: AssetContext = { ...input, states: input.states.map((s) => s.toUpperCase()), isAffiliate: actor.role === "affiliate" };
-  const { analysis, ruleInfo } = await analyzeForSubmission(ctx, actor.partnerId);
+  const { analysis, ruleInfo } = await analyzeForSubmission(ctx, actor.partnerId, actor.id);
   return { analysis, ruleInfo };
 }
 
@@ -110,7 +110,7 @@ export async function createSubmission(actor: Actor, raw: SubmissionInput): Prom
   }
   const states = input.states.map((s) => s.toUpperCase());
   const ctx = ctxOf({ ...input, states }, input.content, actor.role === "affiliate");
-  const { analysis } = await analyzeForSubmission(ctx, actor.partnerId);
+  const { analysis } = await analyzeForSubmission(ctx, actor.partnerId, actor.id);
 
   const ids = await allocateIds();
   const now = new Date();
@@ -178,7 +178,7 @@ export async function resubmit(actor: Actor, submissionId: number, raw: { conten
     throw new WorkflowError("The text is identical to the previous version. Make your changes before resubmitting.", "invalid");
   }
   const isAffiliate = sub.partnerId !== null;
-  const { analysis } = await analyzeForSubmission(ctxOf(sub, content, isAffiliate), sub.partnerId);
+  const { analysis } = await analyzeForSubmission(ctxOf(sub, content, isAffiliate), sub.partnerId, actor.id);
 
   // A previous finding is resolved when the fresh analysis no longer raises that rule. Reviewer-added
   // findings are not re-derivable, so they carry over only while their quote is still in the text.

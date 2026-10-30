@@ -166,8 +166,7 @@ describe("history plan: findings", () => {
     expect(new Set(ai.map((f) => f.confidence))).toEqual(new Set(["low", "medium", "high"]));
     expect(ai.every((f) => f.suggestion)).toBe(true);
     for (const v of plan.versions) {
-      const hasAi = findingsOf(v.id).some((f) => f.source === "ai");
-      expect(v.analysisStatus).toBe(hasAi ? "complete" : "rules_only");
+      expect(v.analysisStatus).toBe("complete"); // the demo story: the model reviewed every version
     }
   });
 

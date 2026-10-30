@@ -13,6 +13,8 @@ export interface EngineOptions {
   partnerRejectionRate?: number;
   /** Rules-only mode: no model call. Used by tests, the eval baseline and the "AI unavailable" path. */
   skipAi?: boolean;
+  /** Shown to the user when `skipAi` is set, e.g. because a usage limit was reached. */
+  skipReason?: string;
   client?: Anthropic;
 }
 
@@ -47,7 +49,7 @@ export async function analyzeAsset(ctx: AssetContext, opts: EngineOptions): Prom
   if (!needsTranscription) deterministic = runDeterministic(ctx, opts.rules, opts.facts);
 
   if (opts.skipAi) {
-    aiNote = "AI review skipped; showing rule-based findings only.";
+    aiNote = opts.skipReason ?? "AI review skipped; showing rule-based findings only.";
   } else {
     try {
       ai = await analyzeWithClaude(ctx, applicable, opts.facts, { image: opts.image, client: opts.client });
