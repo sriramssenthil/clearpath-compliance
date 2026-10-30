@@ -16,7 +16,7 @@ function Label({ children }: { children: string }) {
   return <span className="mb-0.5 block text-xs font-medium text-subtle md:hidden">{children}</span>;
 }
 
-const th = "px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-subtle";
+const th = "px-3 py-2.5 text-left text-xs font-medium uppercase tracking-wide text-subtle";
 const td = "block py-1.5 md:table-cell md:px-3 md:py-3 md:align-top";
 
 function Row({ s, now }: { s: SubmissionSummary; now: Date }) {

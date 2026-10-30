@@ -44,7 +44,7 @@ export default async function ResubmitPage({ params }: { params: Promise<{ id: s
           <ArrowLeft aria-hidden className="size-4" />
           Back to {detail.code}
         </Link>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight">Submit a new version</h1>
+        <h1 className="mt-2 text-2xl font-medium tracking-tight">Submit a new version</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
           {detail.code} is waiting on you. Work through the feedback below, edit the text, check it, then send it back. Version {detail.currentVersion + 1} gets a
           faster review than a first submission.
@@ -76,7 +76,7 @@ export default async function ResubmitPage({ params }: { params: Promise<{ id: s
             <p className="text-sm text-muted">The reviewer did not leave a written note.</p>
           )}
           <div>
-            <h2 className="text-sm font-semibold">Findings to fix ({checklist.length})</h2>
+            <h2 className="text-sm font-medium">Findings to fix ({checklist.length})</h2>
             {checklist.length > 0 ? (
               <div className="mt-2">
                 <FeedbackChecklist items={checklist} />

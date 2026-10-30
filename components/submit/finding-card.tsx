@@ -45,7 +45,7 @@ export function FindingCard({ index, finding: f, info, located, active, note, on
     >
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <SeverityBadge severity={f.severity} />
-        <h4 className="text-sm font-semibold">{info?.title ?? f.ruleCode}</h4>
+        <h4 className="text-sm font-medium">{info?.title ?? f.ruleCode}</h4>
         <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs text-muted">{f.ruleCode}</code>
       </div>
 
@@ -78,7 +78,7 @@ export function FindingCard({ index, finding: f, info, located, active, note, on
 
       {f.suggestion ? (
         <div className="mt-3 rounded-md border border-success-line bg-success-soft p-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-success">Suggested fix</p>
+          <p className="text-xs font-medium uppercase tracking-wide text-success">Suggested fix</p>
           <p className="mt-1 whitespace-pre-wrap text-sm text-foreground [overflow-wrap:anywhere]">{f.suggestion}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button size="sm" variant="secondary" onClick={onReplace} title="Swap the first occurrence of the quoted text for this suggestion">

@@ -7,7 +7,7 @@ export function DecisionsHistory({ decisions, now }: { decisions: DecisionView[]
   return (
     <section aria-labelledby="decisions-heading" className="rounded-lg border border-border bg-surface shadow-card">
       <div className="border-b border-border px-5 py-4">
-        <h2 id="decisions-heading" className="text-base font-semibold tracking-tight text-foreground">Decisions</h2>
+        <h2 id="decisions-heading" className="text-base font-medium tracking-tight text-foreground">Decisions</h2>
         <p className="mt-0.5 text-sm text-muted">Each decision is recorded against the exact version it was made on.</p>
       </div>
       {decisions.length === 0 ? (

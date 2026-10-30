@@ -152,7 +152,7 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
                 </ol>
                 {unlocated.length > 0 ? (
                   <div className="space-y-3">
-                    <h4 className="text-sm font-semibold">Not located in the text</h4>
+                    <h4 className="text-sm font-medium">Not located in the text</h4>
                     <p className="text-xs text-muted">These apply to the asset as a whole or quote text the checker could not pin to one spot.</p>
                     <ol className="space-y-3">{unlocated.map(card)}</ol>
                   </div>

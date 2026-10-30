@@ -13,7 +13,7 @@ export function Section({ id, title, caption, children }: { id: string; title: s
   return (
     <section aria-labelledby={id} className="space-y-3">
       <div>
-        <h2 id={id} className="text-lg font-semibold tracking-tight">
+        <h2 id={id} className="text-lg font-medium tracking-tight">
           {title}
         </h2>
         <p className="mt-0.5 max-w-3xl text-sm text-muted">{caption}</p>
@@ -28,7 +28,7 @@ function Tile({ label, value, detail, caption }: { label: string; value: string;
   return (
     <div className="flex flex-col rounded-lg border border-border bg-surface p-4 shadow-card">
       <dt className="text-sm font-medium text-muted">{label}</dt>
-      <dd className={cn("mt-1 font-semibold tracking-tight tabular-nums", empty ? "text-base text-subtle" : "text-3xl")}>{value}</dd>
+      <dd className={cn("mt-1 font-medium tracking-tight tabular-nums", empty ? "text-base text-subtle" : "text-3xl")}>{value}</dd>
       {detail ? <div className="mt-0.5 text-sm text-foreground">{detail}</div> : null}
       <p className="mt-2 text-xs text-subtle">{caption}</p>
     </div>
@@ -123,7 +123,7 @@ export function TopRules({ rules }: { rules: DashboardStats["topRules"] }) {
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[34rem] text-sm">
-          <thead className="border-b border-border bg-surface-muted text-left text-xs font-semibold uppercase tracking-wide text-subtle">
+          <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-subtle">
             <tr>
               <th scope="col" className="px-4 py-2.5">Rule</th>
               <th scope="col" className="px-4 py-2.5">Times flagged</th>
@@ -180,7 +180,7 @@ export function AgreementBySource({ rows }: { rows: DashboardStats["acceptance"]
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[30rem] text-sm">
-          <thead className="border-b border-border bg-surface-muted text-left text-xs font-semibold uppercase tracking-wide text-subtle">
+          <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-subtle">
             <tr>
               <th scope="col" className="px-4 py-2.5">Source of the flag</th>
               <th scope="col" className="px-4 py-2.5 text-right">Accepted</th>
@@ -230,7 +230,7 @@ export function PartnerScorecard({ partners }: { partners: DashboardStats["partn
     <Card className="overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[56rem] text-sm">
-          <thead className="border-b border-border bg-surface-muted text-left text-xs font-semibold uppercase tracking-wide text-subtle">
+          <thead className="border-b border-border bg-surface-muted text-left text-xs font-medium uppercase tracking-wide text-subtle">
             <tr>
               <th scope="col" className="px-4 py-2.5">Partner</th>
               <th scope="col" className="px-4 py-2.5 text-right">Submissions</th>

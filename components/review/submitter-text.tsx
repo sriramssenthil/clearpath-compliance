@@ -29,7 +29,7 @@ export function SubmitterText({ versionNumber, content, findings, diffSlot }: { 
     <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
       <section aria-label="Asset text" className="min-w-0 rounded-lg border border-border bg-surface shadow-card">
         <div className="border-b border-border px-5 py-3">
-          <h2 className="text-sm font-semibold text-foreground">{diffSlot ? `Changes in version ${versionNumber}` : `Your text, version ${versionNumber}`}</h2>
+          <h2 className="text-sm font-medium text-foreground">{diffSlot ? `Changes in version ${versionNumber}` : `Your text, version ${versionNumber}`}</h2>
         </div>
         <div className="px-5 py-5 sm:px-8">
           {diffSlot ?? <HighlightedText content={content} marks={marks} selectedId={selectedId} pulseKey={tick} onSelect={select} className="mx-auto max-w-[68ch]" />}
@@ -37,7 +37,7 @@ export function SubmitterText({ versionNumber, content, findings, diffSlot }: { 
       </section>
       <section aria-label="Flagged in this version" className="min-w-0 space-y-3">
         <div>
-          <h2 className="text-sm font-semibold text-foreground">Flagged in this version ({findings.length})</h2>
+          <h2 className="text-sm font-medium text-foreground">Flagged in this version ({findings.length})</h2>
           <p className="mt-0.5 text-xs text-muted">
             Open: flagged automatically, not yet confirmed by compliance. Accepted: confirmed by a reviewer and must be fixed. Resolved: fixed in a later version.
           </p>

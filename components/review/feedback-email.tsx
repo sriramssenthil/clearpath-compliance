@@ -5,7 +5,7 @@ export function FeedbackEmail({ label, to, subject, body }: { label: string; to:
   return (
     <section aria-label={label} className="overflow-hidden rounded-lg border border-border bg-surface text-sm">
       <div className="flex items-center justify-between gap-2 border-b border-border bg-surface-muted px-3 py-2">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">{label}</h4>
+        <h4 className="text-xs font-medium uppercase tracking-wide text-muted">{label}</h4>
         <CopyButton text={body} label="Copy email" />
       </div>
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 border-b border-border px-3 py-2 text-xs">

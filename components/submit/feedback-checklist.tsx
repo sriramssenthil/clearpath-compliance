@@ -39,7 +39,7 @@ export function FeedbackChecklist({ items }: { items: ChecklistItem[] }) {
                 <span className="min-w-0 flex-1">
                   <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <SeverityBadge severity={it.severity} />
-                    <span className={cn("text-sm font-semibold", checked && "text-muted line-through")}>{it.ruleTitle}</span>
+                    <span className={cn("text-sm font-medium", checked && "text-muted line-through")}>{it.ruleTitle}</span>
                     <code className="rounded bg-surface-muted px-1.5 py-0.5 text-xs text-muted">{it.ruleCode}</code>
                   </span>
                   <blockquote className="mt-2 border-l-2 border-border-strong pl-3 text-sm italic [overflow-wrap:anywhere]">{it.quote}</blockquote>

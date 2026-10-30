@@ -32,7 +32,7 @@ export function ProductFactsPanel({ data, defaultOpen }: { data: ProductFacts; d
       </summary>
       <div className="space-y-5 border-t border-border px-4 py-4">
         <section aria-label={`${data.facts.displayName} facts`}>
-          <h3 className="text-sm font-semibold">Facts</h3>
+          <h3 className="text-sm font-medium">Facts</h3>
           <dl className="mt-2 grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
             {rows.map(([k, v]) => (
               <div key={k}>
@@ -43,7 +43,7 @@ export function ProductFactsPanel({ data, defaultOpen }: { data: ProductFacts; d
           </dl>
           {data.facts.notes.length > 0 ? (
             <>
-              <h4 className="mt-4 text-xs font-semibold uppercase tracking-wide text-subtle">Notes the checker applies</h4>
+              <h4 className="mt-4 text-xs font-medium uppercase tracking-wide text-subtle">Notes the checker applies</h4>
               <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
                 {data.facts.notes.map((n) => (
                   <li key={n}>{n}</li>
@@ -53,7 +53,7 @@ export function ProductFactsPanel({ data, defaultOpen }: { data: ProductFacts; d
           ) : null}
         </section>
         <section aria-label={`${data.facts.displayName} approved snippets`}>
-          <h3 className="text-sm font-semibold">Approved disclosure snippets</h3>
+          <h3 className="text-sm font-medium">Approved disclosure snippets</h3>
           <ul className="mt-2 space-y-3">
             {data.approvedSnippets.map((s) => (
               <li key={s.id} className="rounded-md border border-border bg-surface-muted/50 p-3">

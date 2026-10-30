@@ -212,7 +212,7 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
           <div className="flex items-start gap-3">
             <Lightbulb aria-hidden className="mt-0.5 size-5 shrink-0 text-accent" />
             <div>
-              <p className="text-sm font-semibold">New here? Load an example ad to see the pre-check in action.</p>
+              <p className="text-sm font-medium">New here? Load an example ad to see the pre-check in action.</p>
               <p className="mt-0.5 text-sm text-muted">It fills in the form with realistic copy that has a few typical problems. Nothing is sent until you submit.</p>
             </div>
           </div>

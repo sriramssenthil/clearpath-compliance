@@ -53,7 +53,7 @@ function Findings({ s }: { s: SubmissionSummary }) {
     <span className="text-sm" title="Findings on the current version that have not been dismissed or resolved">
       <span className="font-medium tabular-nums">{s.openFindings}</span> open
       {s.highOpenFindings > 0 ? (
-        <span className="mt-0.5 block whitespace-nowrap font-semibold text-danger tabular-nums">{s.highOpenFindings} high severity</span>
+        <span className="mt-0.5 block whitespace-nowrap font-medium text-danger tabular-nums">{s.highOpenFindings} high severity</span>
       ) : null}
     </span>
   );
@@ -136,7 +136,7 @@ export function SubmissionsTable({ rows, staff, submitterSide, now }: Props) {
                 <td className="max-w-sm px-4 py-3">
                   <Link
                     href={`/submissions/${s.id}`}
-                    className="text-sm font-semibold text-foreground after:absolute after:inset-0 hover:text-accent"
+                    className="text-sm font-medium text-foreground after:absolute after:inset-0 hover:text-accent"
                   >
                     <span className="mr-2 font-mono text-xs font-medium text-muted">{s.code}</span>
                     {s.title}
@@ -176,7 +176,7 @@ export function SubmissionsTable({ rows, staff, submitterSide, now }: Props) {
         {rows.map((s) => (
           <li key={s.id} className="relative rounded-lg border border-border bg-surface p-4 shadow-card">
             <div className="flex items-start justify-between gap-3">
-              <Link href={`/submissions/${s.id}`} className="min-w-0 text-sm font-semibold after:absolute after:inset-0">
+              <Link href={`/submissions/${s.id}`} className="min-w-0 text-sm font-medium after:absolute after:inset-0">
                 <span className="block font-mono text-xs font-medium text-muted">{s.code}</span>
                 <span className="[overflow-wrap:anywhere]">{s.title}</span>
               </Link>

@@ -29,7 +29,7 @@ export function SubmissionHeader({ detail, viewed, compare, now, actions }: {
             <span aria-hidden> / </span>
             <span className="font-mono text-foreground">{detail.code}</span>
           </p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-foreground [overflow-wrap:anywhere]">{detail.title}</h1>
+          <h1 className="mt-1 text-2xl font-medium tracking-tight text-foreground [overflow-wrap:anywhere]">{detail.title}</h1>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Badge variant={`status-${detail.status}`} dot>{STATUS_LABEL[detail.status]}</Badge>
             <Badge variant={RISK[detail.riskLevel]} title={`Risk score ${detail.riskScore}: points from finding severity, product, channel and partner history. Higher means more scrutiny.`}>

@@ -66,7 +66,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted">{blurb}</p>
         </div>
         {submitter ? (
@@ -117,7 +117,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
         <Card>
           <CardBody className="flex flex-col items-center gap-3 py-12 text-center">
             <FileText aria-hidden className="size-8 text-subtle" />
-            <h2 className="text-base font-semibold">No submissions yet</h2>
+            <h2 className="text-base font-medium">No submissions yet</h2>
             <p className="max-w-md text-sm text-muted">
               {submitter
                 ? "Send your first asset to compliance. You can load an example ad and run the automated pre-check to see how it works before you submit anything."
@@ -135,7 +135,7 @@ export default async function SubmissionsPage({ searchParams }: { searchParams: 
         <Card>
           <CardBody className="flex flex-col items-center gap-3 py-12 text-center">
             <SearchX aria-hidden className="size-8 text-subtle" />
-            <h2 className="text-base font-semibold">No submissions match these filters</h2>
+            <h2 className="text-base font-medium">No submissions match these filters</h2>
             <p className="max-w-md text-sm text-muted">Try a different status, product or search term.</p>
             <Link href="/submissions" className={buttonVariants({ variant: "secondary" })}>
               Clear filters

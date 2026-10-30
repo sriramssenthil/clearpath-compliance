@@ -160,23 +160,23 @@ export function RuleRow({ rule, canEdit }: { rule: RuleRowData; canEdit: boolean
           <>
             <dl className="grid gap-4 lg:grid-cols-2">
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-subtle">What it catches</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-subtle">What it catches</dt>
                 <dd className="mt-1">{rule.description}</dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-subtle">Citation</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-subtle">Citation</dt>
                 <dd className="mt-1">{rule.citation}</dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-subtle">Guidance shown to submitters</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-subtle">Guidance shown to submitters</dt>
                 <dd className="mt-1">{rule.guidance}</dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold uppercase tracking-wide text-subtle">Instruction for the AI check</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-subtle">Instruction for the AI check</dt>
                 <dd className="mt-1">{rule.usesAi ? rule.checkInstruction : "Not used: this rule is decided by code alone."}</dd>
               </div>
               <div className="lg:col-span-2">
-                <dt className="text-xs font-semibold uppercase tracking-wide text-subtle">Deterministic check</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-subtle">Deterministic check</dt>
                 <dd className="mt-1">
                   {rule.configSummary}
                   {rule.patterns && rule.patterns.length > 0 ? (
@@ -213,7 +213,7 @@ export function RuleRow({ rule, canEdit }: { rule: RuleRowData; canEdit: boolean
                   if (dirty && !invalid) save(patch);
                 }}
               >
-                <h3 className="text-sm font-semibold">Edit rule</h3>
+                <h3 className="text-sm font-medium">Edit rule</h3>
                 <p className="text-xs text-muted">Saving creates a new version. Every later analysis uses it; analyses already run are not changed.</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="flex flex-col gap-1 text-xs font-medium text-muted">

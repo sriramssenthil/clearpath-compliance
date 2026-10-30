@@ -47,7 +47,7 @@ export default async function RulesPage() {
   return (
     <div className="space-y-10">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Rules library</h1>
+        <h1 className="text-2xl font-medium tracking-tight">Rules library</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
           {rows.length} rules, {enabledCount} enabled.{" "}
           {canEdit ? "As compliance lead you can enable, disable and edit rules." : "You have read-only access; the compliance lead edits rules."}
@@ -61,20 +61,20 @@ export default async function RulesPage() {
 
       <section aria-labelledby="rules-heading" className="space-y-6">
         <div>
-          <h2 id="rules-heading" className="text-lg font-semibold tracking-tight">Rules</h2>
+          <h2 id="rules-heading" className="text-lg font-medium tracking-tight">Rules</h2>
           <p className="mt-0.5 max-w-3xl text-sm text-muted">{DETECTION_CAPTION}</p>
         </div>
         {categories.map((cat) => {
           const group = rows.filter((r) => r.category === cat);
           return (
             <section key={cat} aria-labelledby={`cat-${cat}`}>
-              <h3 id={`cat-${cat}`} className="mb-2 text-sm font-semibold">
+              <h3 id={`cat-${cat}`} className="mb-2 text-sm font-medium">
                 {cat} <span className="font-normal text-subtle">({group.length})</span>
               </h3>
               <div className="overflow-hidden rounded-lg border border-border bg-surface shadow-card">
                 <div
                   aria-hidden
-                  className="hidden gap-x-4 border-b border-border bg-surface-muted px-4 py-2 text-xs font-semibold uppercase tracking-wide text-subtle lg:grid lg:grid-cols-[minmax(0,1fr)_5.5rem_11rem_8.5rem_9.5rem_3rem]"
+                  className="hidden gap-x-4 border-b border-border bg-surface-muted px-4 py-2 text-xs font-medium uppercase tracking-wide text-subtle lg:grid lg:grid-cols-[minmax(0,1fr)_5.5rem_11rem_8.5rem_9.5rem_3rem]"
                 >
                   <span className="pl-6">Rule</span>
                   <span>Severity</span>
@@ -99,7 +99,7 @@ export default async function RulesPage() {
 
       <section aria-labelledby="facts-heading" className="space-y-3">
         <div>
-          <h2 id="facts-heading" className="text-lg font-semibold tracking-tight">Product facts</h2>
+          <h2 id="facts-heading" className="text-lg font-medium tracking-tight">Product facts</h2>
           <p className="mt-0.5 max-w-3xl text-sm text-muted">
             What ClearPath actually offers, and the approved disclosure wording. These are the source of truth the checker compares ad claims against; they are read-only here.
           </p>

@@ -28,7 +28,7 @@ export function SubmitterView({ detail, now, viewedNumber, findings, latestFindi
       {detail.status === "changes_requested" ? (
         <section aria-labelledby="required-heading" className="rounded-lg border border-border bg-surface shadow-card">
           <div className="border-b border-border px-5 py-4">
-            <h2 id="required-heading" className="text-base font-semibold tracking-tight text-foreground">Required changes ({required.length})</h2>
+            <h2 id="required-heading" className="text-base font-medium tracking-tight text-foreground">Required changes ({required.length})</h2>
             <p className="mt-0.5 text-sm text-muted">Each item was confirmed by the reviewer. Fix them all, then resubmit.</p>
           </div>
           {required.length === 0 ? (
@@ -42,7 +42,7 @@ export function SubmitterView({ detail, now, viewedNumber, findings, latestFindi
                     <span className="min-w-0 flex-1 space-y-2">
                       <span className="flex flex-wrap items-center gap-2">
                         <Badge variant={`severity-${f.severity}`} dot>{f.severity === "high" ? "High" : f.severity === "medium" ? "Medium" : "Low"} severity</Badge>
-                        <span className="font-semibold text-foreground">{f.ruleTitle}</span>
+                        <span className="font-medium text-foreground">{f.ruleTitle}</span>
                         <span className="text-xs text-muted">
                           <code className="font-mono">{f.ruleCode}</code>{f.citation ? `, ${f.citation}` : ""}
                         </span>

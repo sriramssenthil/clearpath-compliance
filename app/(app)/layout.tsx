@@ -1,21 +1,9 @@
 import { Suspense, type ReactNode } from "react";
-import Link from "next/link";
-import { ShieldCheck } from "lucide-react";
 import { listDemoUsers, requireUser, signOut, switchPersona } from "@/lib/auth";
+import { Wordmark } from "@/components/ui/wordmark";
 import { navFor } from "@/lib/personas";
 import { NavLinks } from "./_components/nav-links";
 import { PersonaMenu } from "./_components/persona-menu";
-
-function Wordmark() {
-  return (
-    <Link href="/" className="flex shrink-0 items-center gap-2 rounded-md font-semibold tracking-tight text-foreground">
-      <span className="grid size-7 place-items-center rounded-md bg-accent text-accent-foreground">
-        <ShieldCheck aria-hidden className="size-4" />
-      </span>
-      <span className="text-[15px]">ClearPath Review</span>
-    </Link>
-  );
-}
 
 function DemoBanner() {
   return (
@@ -38,7 +26,7 @@ function PageFallback() {
 function ShellFallback() {
   return (
     <>
-      <header className="border-b border-border bg-surface">
+      <header className="border-b border-border bg-background">
         <div className="mx-auto flex h-14 max-w-6xl items-center px-4 sm:px-6">
           <Wordmark />
         </div>
@@ -58,20 +46,20 @@ async function Shell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 pt-2 sm:h-14 sm:flex-nowrap sm:py-0 sm:px-6">
-          <div className="flex items-center gap-8">
-            <Wordmark />
+          <Wordmark />
+          <div className="flex items-center gap-4 sm:gap-6">
             <div className="hidden sm:block">
               <NavLinks items={items} />
             </div>
+            <PersonaMenu
+              users={users.map((u) => ({ id: u.id, name: u.name, role: u.role, partnerName: u.partnerName }))}
+              current={{ id: user.id, name: user.name, role: user.role, partnerName: user.partnerName }}
+              switchAction={switchPersona}
+              signOutAction={signOut}
+            />
           </div>
-          <PersonaMenu
-            users={users.map((u) => ({ id: u.id, name: u.name, role: u.role, partnerName: u.partnerName }))}
-            current={{ id: user.id, name: user.name, role: user.role, partnerName: user.partnerName }}
-            switchAction={switchPersona}
-            signOutAction={signOut}
-          />
           <div className="order-last w-full pb-2 sm:hidden">
             <NavLinks items={items} />
           </div>

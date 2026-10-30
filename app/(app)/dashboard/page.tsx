@@ -19,7 +19,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-10">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+        <h1 className="text-2xl font-medium tracking-tight">Dashboard</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
           How the review team is doing: whether the queue is under control, how fast decisions are made, and where the issues come from.
         </p>
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
 
       <footer className="space-y-4 border-t border-border pt-6">
         <section aria-labelledby="assumptions">
-          <h2 id="assumptions" className="text-sm font-semibold">
+          <h2 id="assumptions" className="text-sm font-medium">
             Assumptions
           </h2>
           <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muted">
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
           </ul>
         </section>
         <section aria-labelledby="reset" className="space-y-2">
-          <h2 id="reset" className="text-sm font-semibold">
+          <h2 id="reset" className="text-sm font-medium">
             Demo controls
           </h2>
           <p className="text-sm text-muted">Lead only. Restores the sample history so the next person starts from the same place.</p>

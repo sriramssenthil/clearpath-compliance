@@ -157,7 +157,7 @@ export function ReviewerWorkspace(p: Props) {
         <section aria-label="Asset text" className={cn("min-w-0", tab === "text" ? "block" : "hidden", "lg:block")}>
           <div className="rounded-lg border border-border bg-surface shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-3">
-              <h2 className="text-sm font-semibold text-foreground">
+              <h2 className="text-sm font-medium text-foreground">
                 {p.diffSlot ? `Changes in version ${p.versionNumber}` : `Asset text, version ${p.versionNumber}`}
               </h2>
               {!p.diffSlot ? <MarkLegend /> : null}
@@ -190,7 +190,7 @@ export function ReviewerWorkspace(p: Props) {
           )}
         >
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold text-foreground">Findings ({p.findings.length})</h2>
+            <h2 className="text-sm font-medium text-foreground">Findings ({p.findings.length})</h2>
             <button
               type="button"
               onClick={() => setLegend((v) => !v)}

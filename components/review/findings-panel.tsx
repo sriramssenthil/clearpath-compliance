@@ -21,7 +21,7 @@ export function AnalysisSummary({ analysis }: { analysis: AnalysisInfo }) {
   return (
     <section aria-label="Automated analysis summary" className="rounded-lg border border-border bg-surface p-3.5 text-sm">
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="font-semibold text-foreground">Automated analysis</h3>
+        <h3 className="font-medium text-foreground">Automated analysis</h3>
         <Badge variant={chip.variant}>{chip.label}</Badge>
         {analysis.model ? <span className="text-xs text-subtle">Model: {analysis.model}</span> : null}
       </div>
@@ -128,7 +128,7 @@ export function FindingsPanel({
           {located.length > 0 ? <ul role="list" className="space-y-2.5">{located.map(card)}</ul> : null}
           {notLocated.length > 0 ? (
             <section aria-label="Not located in the text" className="space-y-2.5">
-              <h3 className="pt-1 text-xs font-semibold uppercase tracking-wide text-subtle">Not located in the text ({notLocated.length})</h3>
+              <h3 className="pt-1 text-xs font-medium uppercase tracking-wide text-subtle">Not located in the text ({notLocated.length})</h3>
               <ul role="list" className="space-y-2.5">{notLocated.map(card)}</ul>
             </section>
           ) : null}

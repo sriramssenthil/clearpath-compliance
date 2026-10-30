@@ -48,7 +48,7 @@ export function AddFindingForm({
   return (
     <form onSubmit={submit} aria-label="Add a finding" className="space-y-3 rounded-lg border border-accent-line bg-accent-soft/40 p-3.5 text-sm">
       <div className="flex items-start justify-between gap-2">
-        <h4 className="font-semibold text-foreground">Add a finding</h4>
+        <h4 className="font-medium text-foreground">Add a finding</h4>
         <Button type="button" variant="ghost" size="sm" onClick={onClose} disabled={pending}>Cancel</Button>
       </div>
       <div>

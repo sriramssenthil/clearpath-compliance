@@ -64,7 +64,7 @@ export function FindingCard({
         </span>
       </header>
 
-      <h4 className={cn("mt-2 font-semibold leading-snug text-foreground", (dismissed || resolved) && "text-muted")}>{f.ruleTitle}</h4>
+      <h4 className={cn("mt-2 font-medium leading-snug text-foreground", (dismissed || resolved) && "text-muted")}>{f.ruleTitle}</h4>
       <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-muted">
         <code className="rounded bg-surface-muted px-1 py-0.5 font-mono text-[11px] text-foreground">{f.ruleCode}</code>
         {f.citation ? <span>{f.citation}</span> : null}

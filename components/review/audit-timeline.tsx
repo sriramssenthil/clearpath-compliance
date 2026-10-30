@@ -19,7 +19,7 @@ export function AuditTimeline({ events: all, now, audience = "reviewer" }: { eve
   return (
     <section aria-labelledby="audit-heading" className="rounded-lg border border-border bg-surface shadow-card">
       <div className="border-b border-border px-5 py-4">
-        <h2 id="audit-heading" className="text-base font-semibold tracking-tight text-foreground">Audit trail</h2>
+        <h2 id="audit-heading" className="text-base font-medium tracking-tight text-foreground">Audit trail</h2>
         <p className="mt-0.5 text-sm text-muted">Append-only record of every action on this submission.</p>
         {audience === "submitter" ? <p className="mt-0.5 text-xs text-subtle">Internal reviewer triage of findings that were not upheld is not shown here.</p> : null}
       </div>

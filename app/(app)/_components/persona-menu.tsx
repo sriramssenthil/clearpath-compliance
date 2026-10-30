@@ -81,7 +81,7 @@ export function PersonaMenu({ users, current, switchAction, signOutAction }: Pro
             if (group.length === 0) return null;
             return (
               <section key={role} aria-label={PERSONAS[role].label} className="pt-1">
-                <h2 className="px-2.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-subtle">{PERSONAS[role].label}</h2>
+                <h2 className="px-2.5 pb-1 pt-2 text-[11px] font-medium uppercase tracking-wide text-subtle">{PERSONAS[role].label}</h2>
                 <ul>
                   {group.map((u) => {
                     const isCurrent = u.id === current.id;

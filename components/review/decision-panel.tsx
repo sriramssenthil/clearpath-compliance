@@ -49,7 +49,7 @@ export function DecisionPanel(p: Props) {
   if (!p.canDecide) {
     return (
       <section aria-label="Decision" className="space-y-2.5 rounded-lg border border-border bg-surface p-3.5 text-sm">
-        <h3 className="font-semibold text-foreground">Decision</h3>
+        <h3 className="font-medium text-foreground">Decision</h3>
         {sent ? (
           <>
             <p className="text-foreground">{sent.outcome === "approved" ? "Approved. The submitter has been notified." : `${STATUS_LABEL[sent.outcome]} recorded.`}</p>
@@ -76,7 +76,7 @@ export function DecisionPanel(p: Props) {
   if (p.versionNumber !== p.latestNumber) {
     return (
       <section aria-label="Decision" className="space-y-2 rounded-lg border border-border bg-surface p-3.5 text-sm">
-        <h3 className="font-semibold text-foreground">Decision</h3>
+        <h3 className="font-medium text-foreground">Decision</h3>
         <p className="text-muted">You are viewing version {p.versionNumber}. Findings and decisions apply to the latest version only (version {p.latestNumber}).</p>
         <Link href={`/submissions/${p.submissionId}`} className={buttonVariants({ variant: "secondary", size: "sm" })}>View version {p.latestNumber}</Link>
       </section>
@@ -118,7 +118,7 @@ export function DecisionPanel(p: Props) {
 
   return (
     <section aria-label="Decision" className="space-y-3 rounded-lg border border-border-strong bg-surface p-3.5 text-sm shadow-card">
-      <h3 className="font-semibold text-foreground">Your decision</h3>
+      <h3 className="font-medium text-foreground">Your decision</h3>
       <p id="decision-state" className={blockers > 0 ? "text-sev-high" : "text-muted"}>{summary}</p>
 
       {sent ? (

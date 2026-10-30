@@ -33,8 +33,8 @@ export function NavLinks({ items }: { items: NavItem[] }) {
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex h-9 items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors",
-                  isActive ? "bg-accent-soft text-accent" : "text-muted hover:bg-surface-muted hover:text-foreground",
+                  "flex h-9 items-center gap-2 border-b px-2.5 text-sm transition-colors",
+                  isActive ? "border-foreground text-foreground" : "border-transparent text-muted hover:text-foreground",
                 )}
               >
                 <Icon aria-hidden className="size-4" />

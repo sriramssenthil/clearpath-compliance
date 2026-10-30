@@ -19,7 +19,7 @@ function Stat({ label, value, tone, hint }: { label: string; value: number; tone
   return (
     <div className="rounded-lg border border-border bg-surface px-4 py-3 shadow-card">
       <dt className="text-xs font-medium text-muted">{label}</dt>
-      <dd className={cn("mt-0.5 text-2xl font-semibold tabular-nums tracking-tight", value > 0 && tone === "danger" && "text-danger", value > 0 && tone === "warning" && "text-warning")}>
+      <dd className={cn("mt-0.5 text-2xl font-medium tabular-nums tracking-tight", value > 0 && tone === "danger" && "text-danger", value > 0 && tone === "warning" && "text-warning")}>
         {value}
       </dd>
       <p className="text-xs text-subtle">{hint}</p>
@@ -55,7 +55,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">Review queue</h1>
+        <h1 className="text-2xl font-medium tracking-tight">Review queue</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
           Submissions that need a compliance decision, with the most urgent first. Open one to accept or dismiss its flagged findings.
         </p>
@@ -97,7 +97,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
 
       <section aria-labelledby="queue-list-heading" className="space-y-2">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-          <h2 id="queue-list-heading" className="text-sm font-semibold">
+          <h2 id="queue-list-heading" className="text-sm font-medium">
             {rows.length} {rows.length === 1 ? "submission" : "submissions"}
             {filtered > 0 ? " match the filters" : ""}
           </h2>

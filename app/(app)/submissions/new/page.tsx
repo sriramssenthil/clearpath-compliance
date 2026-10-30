@@ -12,7 +12,7 @@ export default async function NewSubmissionPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight">New submission</h1>
+        <h1 className="text-2xl font-medium tracking-tight">New submission</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
           Describe the asset, paste its text and run the pre-check. You will see what compliance would flag, with the exact text and a suggested fix, so you
           can correct it before anyone reviews it.
