@@ -153,6 +153,23 @@ describe("analyzeWithClaude", () => {
     expect(req.messages[0].content[0]).toMatchObject({ type: "image", source: { type: "base64", media_type: "image/png" } });
   });
 
+  it("sends a file-only request with an image block and no typed text", async () => {
+    const { client, parse } = fakeClient({ parsed_output: { extracted_text: "0% APR!", summary: "s", findings: [] } });
+    const r = await analyzeWithClaude({ ...ctx, content: "" }, rules, facts, { client, image: { mediaType: "image/jpeg", base64: "/9j/AAAA" } });
+    const req = (parse.mock.calls[0] as unknown as [Record<string, any>])[0];
+    expect(req.messages[0].content.map((b: { type: string }) => b.type)).toEqual(["image", "text"]);
+    expect(req.messages[0].content[0].source).toEqual({ type: "base64", media_type: "image/jpeg", data: "/9j/AAAA" });
+    expect(req.messages[0].content[1].text).toContain("(No accompanying copy. The submission is the attached file.)");
+    expect(r.extractedText).toBe("0% APR!");
+  });
+
+  it("sends PDFs as a document block", async () => {
+    const { client, parse } = fakeClient(ok([]));
+    await analyzeWithClaude(ctx, rules, facts, { client, image: { mediaType: "application/pdf", base64: "JVBERi0=" } });
+    const req = (parse.mock.calls[0] as unknown as [Record<string, any>])[0];
+    expect(req.messages[0].content[0]).toMatchObject({ type: "document", source: { type: "base64", media_type: "application/pdf" } });
+  });
+
   it("the lenient format returns null instead of throwing on malformed JSON", async () => {
     const { client, parse } = fakeClient(ok([]));
     await analyzeWithClaude(ctx, rules, facts, { client });

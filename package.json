@@ -15,8 +15,9 @@
     "seed:people": "tsx scripts/seed-people.ts",
     "seed:reference": "tsx scripts/seed-reference.ts",
     "seed:history": "tsx scripts/seed-history.ts",
-    "seed:all": "npm run seed:people && npm run seed:reference && npm run seed:history",
-    "test:smoke": "tsx scripts/smoke-workflow.ts"
+    "seed:all": "npm run seed:people && npm run seed:reference && npm run seed:history && npm run seed:precedents",
+    "test:smoke": "tsx scripts/smoke-workflow.ts",
+    "seed:precedents": "tsx scripts/seed-precedents.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

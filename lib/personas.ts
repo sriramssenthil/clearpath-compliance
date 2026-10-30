@@ -4,7 +4,7 @@ export type { Role };
 
 /** Pure module (no server imports) so client components can use it. */
 
-export type NavKey = "submissions" | "new" | "queue" | "dashboard" | "rules";
+export type NavKey = "submissions" | "new" | "queue" | "dashboard" | "rules" | "team";
 
 export interface NavItem {
   key: NavKey;
@@ -62,7 +62,7 @@ export const PERSONAS: Record<Role, Persona> = {
     description: "Owns policy and answers to regulators. Watches workload and edits the rules the checker uses.",
     tryThis: "Read the dashboard (cycle time, first-pass rate, partner scorecard), then open the rules library.",
     defaultRoute: "/dashboard",
-    navKeys: ["dashboard", "queue", "submissions", "rules"],
+    navKeys: ["dashboard", "queue", "submissions", "rules", "team"],
     primaryEmail: PRIMARY_DEMO_EMAIL.lead,
   },
 };
@@ -73,6 +73,7 @@ const NAV_BASE: Record<NavKey, { href: string; label: string }> = {
   queue: { href: "/queue", label: "Review queue" },
   dashboard: { href: "/dashboard", label: "Dashboard" },
   rules: { href: "/rules", label: "Rules" },
+  team: { href: "/team", label: "Team" },
 };
 
 export function navFor(role: Role): NavItem[] {

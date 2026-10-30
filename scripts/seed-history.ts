@@ -5,8 +5,10 @@ config({ path: ".env.local", quiet: true });
 
 async function main() {
   const { resetDemoData } = await import("../lib/seed/history");
+  const { seedVariantsDemo } = await import("../lib/seed/variants-demo");
   const counts = await resetDemoData();
-  console.log(counts);
+  const variants = await seedVariantsDemo();
+  console.log({ ...counts, variants });
 }
 
 main().catch((err) => {

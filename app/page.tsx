@@ -14,7 +14,7 @@ import {
   UserRoundCheck,
   type LucideIcon,
 } from "lucide-react";
-import { findUserByEmail, switchPersona } from "@/lib/auth";
+import { findUserByEmail, isDemoMode, switchPersona } from "@/lib/auth";
 import { PERSONAS, ROLES, type Role } from "@/lib/personas";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/wordmark";
@@ -96,6 +96,21 @@ function PersonaCard({ role, user }: { role: Role; user: { id: number; name: str
 async function PersonaCards() {
   // Defer to request time so the database is never queried during prerender.
   await connection();
+  if (!isDemoMode()) {
+    return (
+      <div className="flex flex-col gap-4 border border-border bg-surface px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted">Demo personas are turned off on this site. Create an account to submit your own assets, or sign in.</p>
+        <div className="flex shrink-0 gap-3">
+          <Link href="/signup" className={buttonVariants({ variant: "primary" })}>
+            Create an account
+          </Link>
+          <Link href="/login" className={buttonVariants({ variant: "secondary" })}>
+            Sign in
+          </Link>
+        </div>
+      </div>
+    );
+  }
   const users = await lookupPersonaUsers();
   const anyMissing = ROLES.some((r) => !users[r]);
   return (
@@ -130,17 +145,23 @@ export default function Home() {
       <header className="relative z-10 border-b border-border bg-background">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
           <Wordmark />
-          <nav aria-label="Page" className="flex items-center gap-5 text-sm text-muted">
-            <a href="#how" className="hidden hover:text-foreground sm:inline">
+          <nav aria-label="Page" className="flex items-center gap-4 text-sm text-muted sm:gap-5">
+            <a href="#how" className="hidden hover:text-foreground md:inline">
               How it works
             </a>
-            <a href={REPO_URL} className="hidden hover:text-foreground sm:inline">
+            <a href={REPO_URL} className="hidden hover:text-foreground md:inline">
               Source
             </a>
-            <a href="#roles" className={buttonVariants({ variant: "primary", size: "sm", className: "px-4" })}>
+            <a href="#roles" className="hidden hover:text-foreground sm:inline">
               Explore the demo
-              <ArrowRight aria-hidden className="size-3.5" />
             </a>
+            <Link href="/login" className="hover:text-foreground">
+              Sign in
+            </Link>
+            <Link href="/signup" className={buttonVariants({ variant: "primary", size: "sm", className: "px-3 sm:px-4" })}>
+              <span className="sm:hidden">Sign up</span>
+              <span className="hidden sm:inline">Create an account</span>
+            </Link>
           </nav>
         </div>
       </header>
@@ -199,10 +220,23 @@ export default function Home() {
 
         <section aria-labelledby="roles" className="mx-auto max-w-6xl scroll-mt-4 px-4 py-14 sm:px-6">
           <h2 id="roles" className="text-3xl tracking-[-0.03em]">
-            Pick a role to explore
+            Explore with a demo persona
           </h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted">
+            No sign-up and no password: each persona is a fictional person with seeded history, and you can switch between them at any time from the menu in
+            the top right. Anyone can open these personas, so do not paste anything real into them.
+          </p>
           <p className="mb-8 mt-2 max-w-2xl text-sm text-muted">
-            No sign-up and no passwords: this is a demo, and you can switch between people at any time from the menu in the top right.
+            Want to check your own ads?{" "}
+            <Link href="/signup" className="text-foreground underline underline-offset-4 hover:text-accent">
+              Create an account
+            </Link>{" "}
+            to upload them under your own name. While demo personas are on, anyone exploring as a reviewer can read the review queue, so do not upload
+            anything confidential. Already have an account?{" "}
+            <Link href="/login" className="text-foreground underline underline-offset-4 hover:text-accent">
+              Sign in
+            </Link>
+            .
           </p>
           <Suspense fallback={<PersonaCardsFallback />}>
             <PersonaCards />

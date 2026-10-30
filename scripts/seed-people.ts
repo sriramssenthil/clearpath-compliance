@@ -24,13 +24,19 @@ async function main() {
     const partnerId = u.partnerName ? (partnerIds.get(u.partnerName) ?? null) : null;
     await db
       .insert(tables.users)
-      .values({ name: u.name, email: u.email, role: u.role, partnerId })
-      .onConflictDoUpdate({ target: tables.users.email, set: { name: u.name, role: u.role, partnerId } });
+      .values({ name: u.name, email: u.email, role: u.role, partnerId, isDemo: true, passwordHash: null })
+      .onConflictDoUpdate({ target: tables.users.email, set: { name: u.name, role: u.role, partnerId, isDemo: true, passwordHash: null } });
   }
 
   const partnerRows = await db.select({ id: tables.partners.id }).from(tables.partners);
-  const userRows = await db.select({ id: tables.users.id }).from(tables.users);
-  console.log({ partners: partnerRows.length, users: userRows.length, expectedPartners: PARTNERS.length, expectedUsers: USERS.length });
+  const userRows = await db.select({ id: tables.users.id, isDemo: tables.users.isDemo }).from(tables.users);
+  console.log({
+    partners: partnerRows.length,
+    users: userRows.length,
+    demoUsers: userRows.filter((u) => u.isDemo).length,
+    expectedPartners: PARTNERS.length,
+    expectedDemoUsers: USERS.length,
+  });
 }
 
 main().catch((err) => {

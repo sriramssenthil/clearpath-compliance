@@ -30,15 +30,17 @@ const cases: { file: string; data: EvalCase }[] = files.map((file) => ({
 }));
 
 describe("example assets", () => {
-  it("has the six expected examples with unique ids", () => {
-    expect(EXAMPLE_ASSETS).toHaveLength(6);
+  it("has the eight expected examples (two of them images) with unique ids", () => {
+    expect(EXAMPLE_ASSETS).toHaveLength(8);
+    expect(EXAMPLE_ASSETS.filter((e) => e.image)).toHaveLength(2);
     const ids = EXAMPLE_ASSETS.map((e) => e.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("uses valid codes, products, channels and non-empty content", () => {
     for (const e of EXAMPLE_ASSETS) {
-      expect(e.content.trim().length, e.id).toBeGreaterThan(0);
+      if (e.image) expect(fs.existsSync(path.join(__dirname, "..", "public", e.image.src)), e.id).toBe(true);
+      else expect(e.content.trim().length, e.id).toBeGreaterThan(0);
       expect(e.title.trim().length, e.id).toBeGreaterThan(0);
       expect(PRODUCTS).toContain(e.product);
       expect(CHANNELS).toContain(e.channel);

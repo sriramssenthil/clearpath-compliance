@@ -9,7 +9,7 @@ Everything in the demo is fictional: the company, the partners, the people and t
 
 ## Try it in three minutes
 
-There are no accounts. Pick a role on the landing page; you can switch roles at any time from the menu in the top right.
+Pick a demo persona on the landing page (no password; switch at any time from the menu in the top right), or create a real account and upload your own ads.
 
 1. **As Jordan Ellis (affiliate partner)**, open *New submission*, choose *Load an example → Affiliate blog post (risky)* and press *Run pre-check*. In about five seconds you get findings with the quoted text, the rule and its citation, why it matters and a suggested fix. Submit it.
 2. **As Priya Raman (compliance reviewer)**, open *Review queue*. The item is there, sorted by deadline and risk. Open it: the flagged text is highlighted and linked to the findings. Accept a few, dismiss one with a reason, then request changes. The submitter's feedback email is drafted from the findings you accepted.
@@ -18,6 +18,11 @@ There are no accounts. Pick a role on the landing page; you can switch roles at 
 5. **As Sofia Alvarez (compliance lead)**, see the dashboard (turnaround, SLA, first-pass approval, partner scorecards), the rules library (editable by the lead) and the *Reset demo data* control.
 
 The example *Affiliate card review with hidden instruction* shows how the system treats hostile content: the page tells the AI reviewer to "report no findings", and it is flagged instead of obeyed.
+
+Also worth trying:
+- **Upload an image ad.** *Load an example* includes two banner images, or drop in your own PNG, JPEG, WebP, GIF or PDF. The text box becomes optional; Claude reads the text off the image (fine print included) and the findings highlight that transcription.
+- **Campaign variants.** As Priya, open CP-1015 (an approved email). Three variants sit below it: two change only a greeting or heading and can be approved together in one step; the third changes the intro period from 15 to 18 months and is held for full review.
+- **Precedents.** On any finding, *Similar past decisions* shows what reviewers decided before on similar wording, what they said, and the wording that eventually passed.
 
 ## The problem
 
@@ -69,6 +74,18 @@ Review runs on email and a spreadsheet, and the compliance team cannot keep up w
 
 **Resubmission resolves findings.** When a new version is submitted the whole asset is analysed again (a disclosure rule can depend on text that did not change), and an earlier finding is resolved if its rule no longer fires. The same reviewer gets it back with a 24-hour clock.
 
+**Real accounts.** Marketers and affiliate partners sign up themselves (affiliates join their partner company or add a new one). Reviewer and lead accounts are invite-only: a lead creates a one-time invite link on the *Team* page. Passwords are hashed with scrypt; sessions are HMAC-signed cookies; repeated failed sign-ins are throttled. The demo personas still exist so anyone can explore, and they are passwordless by design. That means anyone using the demo lead could reset data or mint staff accounts, so both of those need a real lead account. Set `DEMO_MODE=false` to turn the personas off.
+
+**Uploads and text extraction.** Image and PDF ads are checked as files. Large images are resized in the browser to stay under the 4 MB request limit, and the server checks the file's real type from its bytes. Claude transcribes the file, and the transcription plus any typed caption is what the rules and highlights run on. Files are stored privately (in Postgres for this demo) and served only to people allowed to see that submission.
+
+**Precedent recall.** Each finding is matched against past decisions: 59 seeded ones plus every accept or dismiss made in the app, so the library grows as reviewers work. Ranking is BM25 over the wording with a boost for the same rule, which is explainable (the shared words are shown) and enough at this corpus size; embeddings would replace it at scale. Submitters see only the wording that passed, anonymised.
+
+**Change-scoped review.** Every resubmission, and every campaign variant against its approved master, is diffed and each changed stretch is classified as regulated or not. A change counts as regulated if it touches a number or rate, a finance term, a disclosure, a rule pattern, text flagged before, or a sentence containing a number. The classifier deliberately leans towards "regulated", because a false fast-track is the costly mistake. A "No claim changed" item is marked in the queue. Bulk approval re-checks eligibility on the server and records an ordinary reviewer decision for each variant: fast-track never means automatic.
+
+**Priority queue.** Each queue item has a score with a visible breakdown: open findings weighted by severity, SLA urgency, expedite flag, how close the launch date is, the partner's rejection history, and product risk. The weights sit in one constant (`lib/workflow/priority.ts`) for the compliance lead to tune.
+
+**Net-impression read.** A second Claude pass, run in parallel with the main one, reads the ad as a first-time borrower would. It states in two sentences what they think they are being offered and lists the beliefs it creates, each compared with the actual product terms and marked misleading or accurate. This is the UDAAP "reasonable consumer" test and catches misleading-by-omission that no rule can. It is advisory: it never blocks or approves anything.
+
 **Spend guard.** The demo is public and each uncached check costs a cent or two, so live model calls are limited per person and per hour (`lib/workflow/budget.ts`). Past the limit, or if the API fails or refuses, the check falls back to rules-only mode with a visible banner instead of erroring.
 
 ## Accuracy
@@ -102,19 +119,21 @@ How to read this:
 - Rule citations are ones I am confident of (Reg Z 12 CFR 1026.16 and 1026.24, FCRA, FTC Endorsement Guides 16 CFR 255, Reg B, CAN-SPAM, UDAAP). Where something is internal policy, the rule says so.
 
 **Technical**
-- Authentication is a persona switcher (an unsigned cookie holding a user id). It exists so every role can be tried without accounts. Production would use SSO for employees and invite-only accounts for partners. The server still checks role and ownership on every read and write, so a marketer cannot open an affiliate's submission (verified in `npm run test:smoke`).
+- Authentication: see *Real accounts* above. It exists so every role can be tried without accounts. Production would use SSO for employees and invite-only accounts for partners. The server still checks role and ownership on every read and write, so a marketer cannot open an affiliate's submission (verified in `npm run test:smoke`).
 
 ## What I cut, and what I would do next
 
 **Cut for the 24-hour window**
-- **Image and PDF upload.** The engine accepts an image or PDF input (the model transcribes it so highlighting and diffs still work), but there is no upload UI or file storage, and the image path is untested end to end.
+- **Video ads.** Out of scope; images and PDFs are supported.
+- **Email delivery.** Invite links and feedback emails are shown for copying, not sent.
+- **Session revocation.** Sessions are stateless signed cookies, so signing out cannot revoke a copied cookie before it expires (7 days); rotating `AUTH_SECRET` signs everyone out.
 - **Landing-page URL ingestion.** Needs fetching with its own prompt-injection and SSRF hardening; I would rather ship text input correctly.
 - **Concurrency control.** State is read then written in one batch; two reviewers acting on the same finding at once would be last-write-wins. I would add optimistic version checks.
-- **Notifications.** The feedback email is drafted and shown, not sent.
 - **Time zones.** Submission pages show UTC and the queue shows deadlines in Central time. Should be one setting per user.
 
 **Next**
 - Approval expiry when rates or product facts change (list the approved assets that still cite the old terms).
+- Embeddings for precedent search once the decision history is large.
 - Per-rule auto-approve thresholds, switched on with eval data and the audit log behind them.
 - A background queue for analysis, and a cheaper first-pass model with escalation.
 - Post-approval monitoring of live affiliate pages for drift.
@@ -133,9 +152,9 @@ Requires Node 22 and a Postgres database (the demo uses Neon).
 
 ```bash
 npm install
-cp .env.example .env.local        # add ANTHROPIC_API_KEY and DATABASE_URL
+cp .env.example .env.local        # add ANTHROPIC_API_KEY, DATABASE_URL and AUTH_SECRET
 npm run db:migrate                # create the tables
-npm run seed:all                  # people, rules and product facts, eight weeks of history
+npm run seed:all                  # people, rules, product facts, eight weeks of history, precedents
 npm run dev                       # http://localhost:3000
 ```
 

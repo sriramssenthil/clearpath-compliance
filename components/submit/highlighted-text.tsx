@@ -19,15 +19,20 @@ interface Props {
   activeKey: number | null;
   /** Called with the finding index to focus; repeated clicks on overlapping marks cycle through them. */
   onSelect: (index: number) => void;
+  /** Shorter box, for the text read from a file inside the results panel. */
+  compact?: boolean;
 }
 
 /** Read-only rendering of the checked text with a mark around each located finding. */
-export function HighlightedText({ content, findings, activeKey, onSelect }: Props) {
+export function HighlightedText({ content, findings, activeKey, onSelect, compact }: Props) {
   const segments = useMemo(() => buildSegments(content, findings), [content, findings]);
 
   return (
     <div
-      className="max-h-[32rem] min-h-[24rem] overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-border-strong bg-surface-muted px-3 py-2.5 text-sm leading-7"
+      className={cn(
+        "overflow-y-auto whitespace-pre-wrap break-words rounded-md border border-border-strong bg-surface-muted px-3 py-2.5 text-sm leading-7",
+        compact ? "max-h-[20rem]" : "max-h-[32rem] min-h-[24rem]",
+      )}
       tabIndex={-1}
     >
       {segments.map((seg) => {

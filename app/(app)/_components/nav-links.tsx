@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FilePlus, FileText, LayoutDashboard, ListChecks, Scale, type LucideIcon } from "lucide-react";
+import { FilePlus, FileText, LayoutDashboard, ListChecks, Scale, Users, type LucideIcon } from "lucide-react";
 import type { NavItem, NavKey } from "@/lib/personas";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ const ICONS: Record<NavKey, LucideIcon> = {
   queue: ListChecks,
   dashboard: LayoutDashboard,
   rules: Scale,
+  team: Users,
 };
 
 /** Primary navigation. Highlights the most specific matching link (so /submissions/new does not also light up /submissions). */

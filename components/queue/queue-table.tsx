@@ -5,7 +5,8 @@ import type { SubmissionSummary } from "@/lib/workflow/types";
 import { cn } from "@/lib/utils";
 import { ClaimButton } from "./claim-button";
 import { CHANNEL_LABEL, PRODUCT_LABEL, RISK_LABEL } from "./labels";
-import { deadlineCell, formatAbsolute, isFastLane, relativeTime, type DeadlineTone } from "./sla-label";
+import { PriorityCell } from "./priority-cell";
+import { deadlineCell, formatAbsolute, isFastLane, launchLabel, relativeTime, type DeadlineTone } from "./sla-label";
 
 const TONE_VARIANT: Record<DeadlineTone, BadgeVariant> = { danger: "danger", warning: "warning", neutral: "neutral" };
 
@@ -23,6 +24,7 @@ function Row({ s, now }: { s: SubmissionSummary; now: Date }) {
   const dl = deadlineCell(s, now);
   const fast = isFastLane(s);
   const unclaimed = s.assigneeId === null && s.status === "submitted";
+  const launch = launchLabel(s, now);
 
   return (
     <tr
@@ -30,11 +32,29 @@ function Row({ s, now }: { s: SubmissionSummary; now: Date }) {
       className="relative mb-3 block rounded-lg border border-border bg-surface p-4 shadow-card transition-colors hover:bg-surface-muted/60 focus-within:bg-surface-muted/60 md:mb-0 md:table-row md:rounded-none md:border-0 md:border-b md:p-0 md:shadow-none"
     >
       <td className={td}>
+        <Label>Priority</Label>
+        {s.priorityScore ? <PriorityCell code={s.code} breakdown={s.priorityScore} /> : <span className="text-muted">Not scored</span>}
+      </td>
+      <td className={td}>
         <Label>Deadline</Label>
         <div className="flex flex-wrap items-center gap-1.5 md:flex-col md:items-start">
           <Badge variant={TONE_VARIANT[dl.tone]} title={dl.absolute ? formatAbsolute(dl.absolute) : undefined}>
             {dl.text}
           </Badge>
+          {launch ? (
+            <Badge variant={TONE_VARIANT[launch.tone]} title={launch.title}>
+              {launch.text}
+            </Badge>
+          ) : null}
+          {s.fastTrack ? (
+            <span
+              title="Fast-track: the latest version changed no claim or disclosure versus the previous version or its approved master. A reviewer still decides."
+              className="inline-flex items-center gap-1 text-xs font-medium text-success"
+            >
+              <Zap aria-hidden className="size-3" />
+              No claim changed
+            </span>
+          ) : null}
           {fast ? (
             <span title={FAST_LANE_HINT} className="inline-flex items-center gap-1 text-xs font-medium text-success">
               <Zap aria-hidden className="size-3" />
@@ -123,13 +143,17 @@ function Row({ s, now }: { s: SubmissionSummary; now: Date }) {
 }
 
 /** Renders the list in the order the service returned it; sorting is the service's job. */
-export function QueueTable({ rows, now }: { rows: SubmissionSummary[]; now: Date }) {
+export function QueueTable({ rows, now, sort = "priority" }: { rows: SubmissionSummary[]; now: Date; sort?: "priority" | "deadline" }) {
   return (
-    <div className="md:overflow-hidden md:rounded-lg md:border md:border-border md:bg-surface md:shadow-card">
+    // No overflow clipping here: the priority breakdown floats over the rows below it.
+    <div className="md:rounded-lg md:border md:border-border md:bg-surface md:shadow-card">
       <table className="block w-full text-sm md:table">
-        <caption className="sr-only">Submissions sorted by deadline, then risk</caption>
+        <caption className="sr-only">
+          {sort === "priority" ? "Submissions sorted by priority score, highest first" : "Submissions sorted by deadline, then risk"}
+        </caption>
         <thead className="hidden border-b border-border bg-surface-muted md:table-header-group">
           <tr>
+            <th scope="col" className={th}>Priority</th>
             <th scope="col" className={th}>Deadline</th>
             <th scope="col" className={th}>Risk</th>
             <th scope="col" className={th}>Submission</th>

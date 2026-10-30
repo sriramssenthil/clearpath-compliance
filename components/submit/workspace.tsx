@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { resultHasFilePart, spanInPart, splitCombinedContent } from "@/lib/workflow/assets";
 import { AssetEditor } from "./asset-editor";
 import { HighlightedText } from "./highlighted-text";
 import { MIN_CONTENT } from "./options";
@@ -17,12 +18,16 @@ interface Props {
   /** Changes whenever the product, channel or states change, which also outdates a result. */
   contextKey?: string;
   toolbar?: ReactNode;
+  /** The file uploader. */
+  fileSlot?: ReactNode;
+  /** A file is attached (new or kept), so the text is optional. */
+  hasFile?: boolean;
 }
 
 const EMPTY: Record<number, string> = {};
 
 /** Asset editor and pre-check results side by side (stacked on small screens), wired together. */
-export function Workspace({ text, onTextChange, pre, disabled, textError, contextKey = "", toolbar }: Props) {
+export function Workspace({ text, onTextChange, pre, disabled, textError, contextKey = "", toolbar, fileSlot, hasFile = false }: Props) {
   const [view, setView] = useState<"edit" | "highlight">("edit");
   const [activeKey, setActiveKey] = useState<number | null>(null);
   const [noteState, setNoteState] = useState<{ owner: unknown; map: Record<number, string> }>({ owner: null, map: {} });
@@ -35,13 +40,21 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
   const sorted = useMemo(() => sortByPosition(analysis?.findings ?? []), [analysis]);
   const stale = isStale(pre, text, contextKey);
   const running = pre.phase === "running";
-  const canRun = text.trim().length >= MIN_CONTENT;
-  const anyLocated = Boolean(analysis) && sorted.some((f) => validSpan(analysis!.content, f) !== null);
-  const canHighlight = anyLocated && !stale;
+  const canRun = hasFile || text.trim().length >= MIN_CONTENT;
   const labels = useMemo(
     () => sorted.map((f) => ({ ...f, label: pre.result?.ruleInfo[f.ruleCode]?.title ?? f.ruleCode })),
     [sorted, pre.result],
   );
+  // With a file, the checked content is the transcription followed by the typed copy. The editor
+  // highlights the typed part; the results panel shows the transcription. Indexes stay global keys.
+  const parts = useMemo(() => (analysis ? splitCombinedContent(analysis.content, resultHasFilePart(analysis)) : null), [analysis]);
+  const inPart = (part: { text: string; start: number } | null | undefined) =>
+    labels.map((f) => ({ ...f, ...(spanInPart(f, part ?? null) ?? { start: null, end: null }) }));
+  const typedLabels = inPart(parts?.typed);
+  const fileLabels = parts?.transcription ? inPart(parts.transcription) : null;
+  const inFile = (key: number) => Boolean(fileLabels && fileLabels[key]?.start !== null);
+  const anyLocated = Boolean(parts?.typed) && typedLabels.some((f) => validSpan(parts!.typed!.text, f) !== null);
+  const canHighlight = anyLocated && !stale;
 
   // Per-card notes belong to one result; a new result starts clean.
   const notes = noteState.owner === analysis ? noteState.map : EMPTY;
@@ -72,7 +85,7 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
   };
 
   const showInText = (key: number) => {
-    setView("highlight");
+    if (!inFile(key)) setView("highlight");
     emphasize(key);
     scrollTo(`finding-mark-${key}`);
   };
@@ -85,6 +98,10 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
   const apply = (key: number, mode: "replace" | "append") => {
     const f = sorted[key];
     if (!f?.suggestion) return;
+    if (mode === "replace" && inFile(key)) {
+      setNote(key, "This wording is in the uploaded file. Change it in the ad itself and upload the new file, then re-run the pre-check.");
+      return;
+    }
     const edit = mode === "replace" ? replaceQuote(text, f.quote, f.suggestion) : appendText(text, f.suggestion);
     if (!edit) {
       setNote(key, "That quoted text is no longer in the editor. Use Append to end or Copy instead.");
@@ -110,14 +127,20 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
         onViewChange={setView}
         canHighlight={canHighlight}
         highlightHint={
-          !analysis ? "Run the pre-check first" : stale ? "Re-run the pre-check to highlight the current text" : "No findings point to a specific spot in the text"
+          !analysis ? "Run the pre-check first" : stale
+              ? "Re-run the pre-check to highlight the current text"
+              : parts?.transcription
+                ? "No findings point to the typed copy; findings in your file are highlighted in the results"
+                : "No findings point to a specific spot in the text"
         }
-        highlighted={analysis ? <HighlightedText content={analysis.content} findings={labels} activeKey={activeKey} onSelect={selectFromText} /> : null}
+        highlighted={parts?.typed ? <HighlightedText content={parts.typed.text} findings={typedLabels} activeKey={activeKey} onSelect={selectFromText} /> : null}
         running={running}
         hasResult={Boolean(analysis)}
         canRun={canRun}
         onRun={() => pre.run(text, contextKey)}
         toolbar={toolbar}
+        fileSlot={fileSlot}
+        hasFile={hasFile}
       />
       <PrecheckPanel
         pre={pre}
@@ -130,6 +153,12 @@ export function Workspace({ text, onTextChange, pre, disabled, textError, contex
         onReplace={(i) => apply(i, "replace")}
         onAppend={(i) => apply(i, "append")}
         onShow={showInText}
+        fileText={
+          parts?.transcription && fileLabels ? (
+            <HighlightedText content={parts.transcription.text} findings={fileLabels} activeKey={activeKey} onSelect={selectFromText} compact />
+          ) : null
+        }
+        fileTextEmpty={Boolean(parts?.transcription) && !parts?.transcription?.text.trim()}
       />
     </div>
   );

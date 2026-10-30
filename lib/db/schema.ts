@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   index,
   integer,
@@ -45,6 +46,11 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   role: roleEnum("role").notNull(),
   partnerId: integer("partner_id").references(() => partners.id),
+  /** scrypt hash, self-describing ("scrypt$N$r$p$salt$hash", see lib/auth/password.ts). Null for passwordless demo personas. */
+  passwordHash: text("password_hash"),
+  /** Seeded demo persona: may be entered from the landing page without a password when DEMO_MODE is on. */
+  isDemo: boolean("is_demo").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const submissions = pgTable(
@@ -64,6 +70,8 @@ export const submissions = pgTable(
     submitterId: integer("submitter_id").notNull().references(() => users.id),
     partnerId: integer("partner_id").references(() => partners.id),
     assigneeId: integer("assignee_id").references(() => users.id),
+    /** Set when this asset is a variant of an approved master asset (campaign variants). */
+    parentId: integer("parent_id").references((): AnyPgColumn => submissions.id),
     currentVersion: integer("current_version").notNull().default(1),
     riskScore: integer("risk_score").notNull().default(0),
     riskLevel: riskLevelEnum("risk_level").notNull().default("low"),
@@ -85,6 +93,12 @@ export const versions = pgTable(
     content: text("content").notNull(), // pasted text, fetched page text, or image transcription
     sourceUrl: text("source_url"),
     assetUrl: text("asset_url"),
+    /** Uploaded image or PDF this version was analysed from (its transcription is part of `content`). */
+    assetId: integer("asset_id").references((): AnyPgColumn => assets.id, { onDelete: "set null" }),
+    /** Text typed by the submitter, kept separately from any transcription so a resubmission can prefill it. */
+    inputText: text("input_text"),
+    /** "Reasonable consumer" read of the asset (see lib/compliance/net-impression.ts). */
+    netImpression: jsonb("net_impression"),
     contentHash: text("content_hash").notNull(),
     analysisStatus: analysisStatusEnum("analysis_status").notNull().default("pending"),
     analysisSummary: text("analysis_summary"),
@@ -188,3 +202,57 @@ export const aiUsage = pgTable(
   },
   (t) => [index("ai_usage_created_idx").on(t.createdAt)],
 );
+
+/** Uploaded ad files. Stored in Postgres (base64) to keep the demo dependency-free; object storage in production. */
+export const assets = pgTable("assets", {
+  id: serial("id").primaryKey(),
+  ownerId: integer("owner_id").notNull().references(() => users.id),
+  mediaType: text("media_type").notNull(), // image/png | image/jpeg | image/webp | image/gif | application/pdf
+  filename: text("filename").notNull(),
+  sizeBytes: integer("size_bytes").notNull(),
+  sha256: text("sha256").notNull(),
+  dataBase64: text("data_base64").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Invitations for accounts that cannot self-register (reviewers, leads) or that a lead creates for a partner. */
+export const invites = pgTable("invites", {
+  id: serial("id").primaryKey(),
+  tokenHash: text("token_hash").notNull().unique(), // sha256 of the token; the raw token is only shown once
+  email: text("email").notNull(),
+  role: roleEnum("role").notNull(),
+  partnerId: integer("partner_id").references(() => partners.id),
+  createdBy: integer("created_by").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Sign-in attempts, for throttling password guessing. */
+export const authAttempts = pgTable(
+  "auth_attempts",
+  {
+    id: serial("id").primaryKey(),
+    email: text("email").notNull(),
+    ip: text("ip"),
+    success: boolean("success").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("auth_attempts_email_idx").on(t.email, t.createdAt)],
+);
+
+/** Past compliance decisions used as precedent: what was flagged, what the reviewer said, what wording passed. */
+export const precedents = pgTable("precedents", {
+  id: serial("id").primaryKey(),
+  ruleCode: text("rule_code").notNull(),
+  product: productEnum("product").notNull(),
+  channel: channelEnum("channel").notNull(),
+  originalText: text("original_text").notNull(),
+  issue: text("issue").notNull(),
+  reviewerName: text("reviewer_name").notNull(),
+  reviewerComment: text("reviewer_comment").notNull(),
+  outcome: text("outcome").notNull(), // fixed | dismissed | rejected
+  approvedText: text("approved_text"),
+  decidedAt: timestamp("decided_at", { withTimezone: true }).notNull(),
+  submissionCode: text("submission_code"),
+});

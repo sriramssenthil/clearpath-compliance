@@ -6,10 +6,12 @@ import { db, tables } from "@/lib/db";
 import { requireRole } from "@/lib/auth";
 import { currentActor } from "@/lib/workflow/action-helpers";
 import { listQueue } from "@/lib/workflow/queries";
+import { listPrioritizedQueue } from "@/lib/workflow/queue";
 import { Card, CardBody } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { FilterBar } from "@/components/queue/filter-bar";
 import { QueueTable } from "@/components/queue/queue-table";
+import { PriorityExplainer } from "@/components/queue/priority-explainer";
 import { activeFilterCount, parseQueueView, queueHref, queueStats, STATUS_VIEWS, toQueueFilters } from "@/components/queue/params";
 import { cn } from "@/lib/utils";
 
@@ -41,14 +43,14 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
   const filters = toQueueFilters(view);
   const defaultView = view.status === "needs_review" && activeFilterCount(view) === 0;
 
+  const now = new Date();
   const [rows, wholeQueue, partners] = await Promise.all([
-    listQueue(actor, filters),
+    listPrioritizedQueue(actor, filters, view.sort, now),
     // The stat strip always describes the whole queue, whatever the filters below are doing.
     defaultView ? null : listQueue(actor),
     db.select({ id: tables.partners.id, name: tables.partners.name }).from(tables.partners).orderBy(asc(tables.partners.name)),
   ]);
   const stats = queueStats(wholeQueue ?? rows);
-  const now = new Date();
   const filtered = activeFilterCount(view);
   const empty = EMPTY[view.status];
 
@@ -57,7 +59,7 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
       <header>
         <h1 className="text-2xl font-medium tracking-tight">Review queue</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
-          Submissions that need a compliance decision, with the most urgent first. Open one to accept or dismiss its flagged findings.
+          Submissions that need a compliance decision, highest priority first. Open one to accept or dismiss its flagged findings.
         </p>
       </header>
 
@@ -96,13 +98,14 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
       <FilterBar key={queueHref(view)} view={view} partners={partners} activeCount={filtered} />
 
       <section aria-labelledby="queue-list-heading" className="space-y-2">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-          <h2 id="queue-list-heading" className="text-sm font-medium">
-            {rows.length} {rows.length === 1 ? "submission" : "submissions"}
-            {filtered > 0 ? " match the filters" : ""}
-          </h2>
-          <p className="text-xs text-subtle">Sorted by deadline, then risk</p>
-        </div>
+        <h2 id="queue-list-heading" className="text-sm font-medium">
+          {rows.length} {rows.length === 1 ? "submission" : "submissions"}
+          {filtered > 0 ? " match the filters" : ""}
+          <span className="font-normal text-subtle">
+            {view.sort === "priority" ? ", highest priority first" : ", by SLA deadline, then risk"}
+          </span>
+        </h2>
+        <PriorityExplainer view={view} />
 
         {rows.length === 0 ? (
           <Card>
@@ -111,14 +114,14 @@ export default async function QueuePage({ searchParams }: { searchParams: Promis
               <p className="font-medium">{filtered > 0 ? "No submissions match these filters" : empty.title}</p>
               <p className="max-w-md text-sm text-muted">{filtered > 0 ? "Try removing a filter or searching for a different code or title." : empty.body}</p>
               {filtered > 0 ? (
-                <Link href={queueHref({ status: view.status })} className={buttonVariants({ variant: "secondary", size: "sm", className: "mt-2" })}>
+                <Link href={queueHref({ status: view.status, sort: view.sort })} className={buttonVariants({ variant: "secondary", size: "sm", className: "mt-2" })}>
                   Clear filters
                 </Link>
               ) : null}
             </CardBody>
           </Card>
         ) : (
-          <QueueTable rows={rows} now={now} />
+          <QueueTable rows={rows} now={now} sort={view.sort} />
         )}
       </section>
     </div>

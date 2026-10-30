@@ -73,3 +73,21 @@ export function relativeTime(then: Date, now: Date): string {
   if (ms < DAY) return plural(Math.floor(ms / HOUR), "hour");
   return plural(Math.floor(ms / DAY), "day");
 }
+
+/**
+ * Launch dates are calendar days stored as UTC midnight, so they are formatted in UTC.
+ * "Launch passed" once the day is over; "Launches today", "Launches tomorrow", "Launches Fri" within a week, else "Launches Nov 12".
+ */
+export function launchLabel(
+  s: { status: Status; launchDate: Date | null },
+  now: Date,
+): { text: string; tone: DeadlineTone; title: string } | null {
+  if (!s.launchDate || s.status === "approved" || s.status === "rejected" || s.status === "withdrawn") return null;
+  const day = (d: Date) => Math.floor(d.getTime() / DAY);
+  const diff = day(s.launchDate) - day(now);
+  const f = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-US", { timeZone: "UTC", ...o }).format(s.launchDate!);
+  const title = `Target launch ${f({ weekday: "long", month: "short", day: "numeric", year: "numeric" })}`;
+  if (diff < 0) return { text: "Launch passed", tone: "danger", title: `${title}, before a compliance decision` };
+  const text = diff === 0 ? "Launches today" : diff === 1 ? "Launches tomorrow" : diff < 7 ? `Launches ${f({ weekday: "short" })}` : `Launches ${f({ month: "short", day: "numeric" })}`;
+  return { text, tone: diff <= 2 ? "warning" : "neutral", title };
+}

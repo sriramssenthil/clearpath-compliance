@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { AssetViewer } from "./asset-viewer";
 import type { SubmissionDetail } from "@/lib/workflow/types";
 import { FeedbackEmail } from "./feedback-email";
 import { feedbackSubject } from "./format";
@@ -71,6 +72,20 @@ export function SubmitterView({ detail, now, viewedNumber, findings, latestFindi
           subject={feedbackSubject(detail.code, detail.title, feedbackDecision.outcome)}
           body={feedbackDecision.feedbackDraft}
         />
+      ) : null}
+
+      {viewed.asset ? (
+        <section aria-labelledby="file-heading" className="rounded-lg border border-border bg-surface shadow-card">
+          <div className="border-b border-border px-5 py-3">
+            <h2 id="file-heading" className="text-sm font-medium text-foreground">Your file, version {viewed.number}</h2>
+            <p className="mt-0.5 text-xs text-muted">
+              The text below starts with the text read from this file{viewed.inputText ? ", followed by your accompanying copy after the marked line" : ""}.
+            </p>
+          </div>
+          <div className="px-5 py-5 sm:px-8">
+            <AssetViewer asset={viewed.asset} className="mx-auto max-w-[68ch]" />
+          </div>
+        </section>
       ) : null}
 
       <SubmitterText versionNumber={viewed.number} content={viewed.content} findings={findings} diffSlot={diffSlot} />

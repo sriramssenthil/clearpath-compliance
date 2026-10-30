@@ -1,4 +1,5 @@
 import type { EngineResult } from "@/lib/compliance/engine";
+import type { AssetInfo, ChangeScope, NetImpression, PrecedentMatch, PriorityBreakdown } from "@/lib/compliance/feature-types";
 import type { Channel, Product, Severity } from "@/lib/compliance/types";
 import type { Outcome, Role, SlaState, Status } from "./flow";
 
@@ -38,6 +39,12 @@ export interface PrecheckInput {
 export interface PrecheckResult {
   analysis: EngineResult;
   ruleInfo: Record<string, RuleInfo>;
+  /** Advisory "reasonable consumer" read; null when it could not be produced. */
+  netImpression: NetImpression | null;
+  /** The real terms, for showing next to the consumer read. */
+  facts: { label: string; value: string }[];
+  /** Similar past decisions per finding, index-aligned with `analysis.findings`. */
+  precedents: PrecedentMatch[][];
 }
 
 export interface SubmissionInput {
@@ -51,6 +58,8 @@ export interface SubmissionInput {
   priority: "standard" | "expedited";
   priorityReason?: string | null;
   notes?: string | null;
+  /** Id of an approved submission this asset is a variant of (campaign variants). */
+  parentId?: number | null;
 }
 
 export interface SubmissionSummary {
@@ -72,9 +81,16 @@ export interface SubmissionSummary {
   assigneeId: number | null;
   assigneeName: string | null;
   submittedAt: Date;
+  updatedAt: Date;
   dueAt: Date | null;
   decidedAt: Date | null;
+  launchDate: Date | null;
+  parentId: number | null;
   sla: SlaState;
+  /** Filled by the queue (see lib/workflow/priority.ts). */
+  priorityScore?: PriorityBreakdown;
+  /** Latest version changed no regulated text versus the previous version or its approved master. */
+  fastTrack?: boolean;
 }
 
 export interface FindingView {
@@ -96,6 +112,8 @@ export interface FindingView {
   dismissReason: string | null;
   actedByName: string | null;
   actedAt: Date | null;
+  /** Most similar past decisions (reviewers only). */
+  precedents?: PrecedentMatch[];
 }
 
 export interface VersionView {
@@ -104,6 +122,11 @@ export interface VersionView {
   content: string;
   sourceUrl: string | null;
   analysisStatus: "pending" | "complete" | "rules_only" | "failed";
+  asset: AssetInfo | null;
+  inputText: string | null;
+  netImpression: NetImpression | null;
+  /** What changed versus the previous version (or the master, for v1 of a variant). */
+  changeScope?: ChangeScope | null;
   analysisSummary: string | null;
   model: string | null;
   createdByName: string;
@@ -147,6 +170,8 @@ export interface SubmissionDetail extends SubmissionSummary {
   decisions: DecisionView[];
   audit: AuditView[];
   permissions: Permissions;
+  parent: { id: number; code: string; title: string } | null;
+  variants: SubmissionSummary[];
 }
 
 export interface QueueFilters {

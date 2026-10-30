@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { PrecedentList } from "./precedent-list";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -85,6 +86,10 @@ export function FindingCard({
           </div>
           <p className="mt-1 leading-relaxed text-foreground">{f.suggestion}</p>
         </div>
+      ) : null}
+
+      {audience === "reviewer" && f.precedents?.length ? (
+        <PrecedentList matches={f.precedents} submissionIds={f.precedentIds} className="mt-2.5" />
       ) : null}
 
       {f.source === "ai" && audience === "reviewer" ? (

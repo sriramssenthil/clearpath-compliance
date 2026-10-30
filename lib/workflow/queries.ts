@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { db, tables } from "@/lib/db";
+import type { NetImpression } from "@/lib/compliance/feature-types";
 import { ruleFromRow } from "@/lib/data/reference";
 import { canReview, SLA_HOURS, slaState, WITH_COMPLIANCE, type Outcome, type Status } from "./flow";
 import { canView, permissionsFor } from "./permissions";
@@ -52,7 +53,8 @@ async function summarize(rows: SubmissionRow[], now = new Date()): Promise<Submi
     submitterName: names.user.get(r.submitterId) ?? "Unknown",
     partnerId: r.partnerId, partnerName: r.partnerId ? (names.partner.get(r.partnerId) ?? null) : null,
     assigneeId: r.assigneeId, assigneeName: r.assigneeId ? (names.user.get(r.assigneeId) ?? null) : null,
-    submittedAt: r.submittedAt, dueAt: r.dueAt, decidedAt: r.decidedAt, sla: slaState(r.status, r.dueAt, now),
+    submittedAt: r.submittedAt, updatedAt: r.updatedAt, dueAt: r.dueAt, decidedAt: r.decidedAt, launchDate: r.launchDate,
+    parentId: r.parentId, sla: slaState(r.status, r.dueAt, now),
   }));
 }
 
@@ -122,8 +124,17 @@ export async function getDetail(actor: Actor, id: number): Promise<SubmissionDet
     issue: f.issue, suggestion: f.suggestion, confidence: f.confidence, status: f.status, dismissReason: f.dismissReason,
     actedByName: f.actedBy ? (names.user.get(f.actedBy) ?? null) : null, actedAt: f.actedAt,
   });
+  const assetRows = versions.some((v) => v.assetId)
+    ? await db
+        .select({ id: tables.assets.id, mediaType: tables.assets.mediaType, filename: tables.assets.filename, sizeBytes: tables.assets.sizeBytes })
+        .from(tables.assets)
+        .where(inArray(tables.assets.id, versions.flatMap((v) => (v.assetId ? [v.assetId] : []))))
+    : [];
+  const assetById = new Map(assetRows.map((a) => [a.id, a]));
   const versionViews: VersionView[] = versions.map((v) => ({
     id: v.id, number: v.number, content: v.content, sourceUrl: v.sourceUrl, analysisStatus: v.analysisStatus,
+    asset: v.assetId ? (assetById.get(v.assetId) ?? null) : null, inputText: v.inputText,
+    netImpression: (v.netImpression as NetImpression | null) ?? null,
     analysisSummary: v.analysisSummary, model: v.model, createdByName: names.user.get(v.createdBy) ?? "Unknown", createdAt: v.createdAt,
     findings: findings
       .filter((f) => f.versionId === v.id)
@@ -145,6 +156,14 @@ export async function getDetail(actor: Actor, id: number): Promise<SubmissionDet
     ...summary,
     states: row.states, launchDate: row.launchDate, priorityReason: row.priorityReason, notes: row.notes,
     versions: versionViews, decisions: decisionViews, audit: auditViews, permissions: permissionsFor(actor, row),
+    parent: row.parentId
+      ? await db
+          .select({ id: tables.submissions.id, code: tables.submissions.code, title: tables.submissions.title })
+          .from(tables.submissions)
+          .where(eq(tables.submissions.id, row.parentId))
+          .then((r) => r[0] ?? null)
+      : null,
+    variants: [],
   };
 }
 
@@ -334,4 +353,19 @@ export async function listRulesWithUsage(): Promise<RuleWithUsage[]> {
       },
     };
   });
+}
+
+/**
+ * An uploaded file with its bytes, only when the actor may view at least one submission whose
+ * version uses it. Unlinked or foreign assets return null, the same as a missing id.
+ */
+export async function getViewableAsset(actor: Actor, assetId: number) {
+  const links = await db
+    .select({ submitterId: tables.submissions.submitterId, partnerId: tables.submissions.partnerId })
+    .from(tables.versions)
+    .innerJoin(tables.submissions, eq(tables.versions.submissionId, tables.submissions.id))
+    .where(eq(tables.versions.assetId, assetId));
+  if (!links.some((s) => canView(actor, s))) return null;
+  const [asset] = await db.select().from(tables.assets).where(eq(tables.assets.id, assetId));
+  return asset ?? null;
 }

@@ -9,7 +9,10 @@ export interface ExampleAsset {
   states: string[];
   isAffiliate: boolean;
   title: string;
+  /** Typed text. For image examples this is the accompanying copy and may be empty. */
   content: string;
+  /** Image examples: a file under public/ that the "Load an example" menu puts into the uploader. */
+  image?: { src: string; filename: string };
   expectedRuleCodes: RuleCode[];
 }
 
@@ -172,5 +175,33 @@ Apply for the ClearPath Cash Back Card: https://clearpath.example/card?ref=cardc
     title: "ClearPath loan pre-qualification text",
     content: `ClearPath: Hi Maria, you're pre-qualified for a personal loan offer. Rates 8.99%-35.99% APR. See your rate with a soft pull that won't affect your credit score: https://clearpath.example/r/k29d Terms apply.`,
     expectedRuleCodes: ["SMS-OPTOUT"],
+  },
+  {
+    id: "card-banner-image",
+    label: "Credit card banner image (risky)",
+    description:
+      "A PNG display banner, no typed text: '0% APR! No annual fee! You're pre-approved' with the intro period and go-to APR only in unreadable fine print. Shows how image ads are read and checked.",
+    product: "credit_card",
+    channel: "display",
+    states: [],
+    isAffiliate: false,
+    title: "ClearPath Cash Rewards Card - 0% APR display banner (image)",
+    content: "",
+    image: { src: "/examples/card-banner-risky.png", filename: "card-banner-risky.png" },
+    expectedRuleCodes: ["REGZ-16-TRIGGER", "REGZ-16-INTRO", "FCRA-PREQUAL"],
+  },
+  {
+    id: "loan-banner-image",
+    label: "Personal loan banner image with caption (compliant)",
+    description:
+      "A PNG display banner with a clear APR range, amounts, terms and a soft-pull note, plus a short typed caption. Shows a file and accompanying copy checked together.",
+    product: "personal_loan",
+    channel: "display",
+    states: [],
+    isAffiliate: false,
+    title: "ClearPath Personal Loans - debt consolidation banner (image)",
+    content: "Check your rate with ClearPath Personal Loans at clearpath.example/loans. Checking your rate will not affect your credit score.",
+    image: { src: "/examples/loan-banner-compliant.png", filename: "loan-banner-compliant.png" },
+    expectedRuleCodes: [],
   },
 ];

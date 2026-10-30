@@ -62,3 +62,17 @@ export async function withdrawAction(submissionId: number): Promise<ActionResult
   refresh(submissionId);
   return res;
 }
+
+/** Bulk-approve fast-track variants of an approved master. Eligibility is re-checked on the server. */
+export async function approveVariantsAction(masterId: number, ids: number[]): Promise<{ ok: boolean; error?: string; approved?: number }> {
+  if (!validId(masterId) || !Array.isArray(ids) || !ids.every(validId) || ids.length > 200) return { ok: false, error: "Invalid request." };
+  const actor = await currentActor();
+  const { approveVariants } = await import("@/lib/workflow/variants");
+  const res = await toResult(() => approveVariants(actor, masterId, ids));
+  refresh(masterId);
+  for (const id of ids) revalidatePath(`/submissions/${id}`);
+  if (!res.ok) return { ok: false, error: res.error };
+  return res.data.skipped > 0
+    ? { ok: true, approved: res.data.approved, error: `${res.data.skipped} could not be approved: no longer eligible.` }
+    : { ok: true, approved: res.data.approved };
+}

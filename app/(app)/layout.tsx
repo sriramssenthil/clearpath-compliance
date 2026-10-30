@@ -41,7 +41,8 @@ function ShellFallback() {
 // The session read happens here, behind a Suspense boundary, so the banner and fallback stay in the static shell.
 async function Shell({ children }: { children: ReactNode }) {
   const user = await requireUser();
-  const users = await listDemoUsers();
+  // Only a demo persona gets the persona switcher; real accounts never see (or load) the demo list.
+  const users = user.isDemo ? await listDemoUsers() : [];
   const items = navFor(user.role);
 
   return (
@@ -55,7 +56,7 @@ async function Shell({ children }: { children: ReactNode }) {
             </div>
             <PersonaMenu
               users={users.map((u) => ({ id: u.id, name: u.name, role: u.role, partnerName: u.partnerName }))}
-              current={{ id: user.id, name: user.name, role: user.role, partnerName: user.partnerName }}
+              current={{ id: user.id, name: user.name, email: user.email, role: user.role, partnerName: user.partnerName, isDemo: user.isDemo }}
               switchAction={switchPersona}
               signOutAction={signOut}
             />

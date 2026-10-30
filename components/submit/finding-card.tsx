@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface Props {
+  /** Extra content at the bottom of the card (e.g. wording compliance approved before). */
+  children?: React.ReactNode;
   index: number;
   finding: AnchoredFinding;
   info?: RuleInfo;
@@ -21,7 +23,7 @@ interface Props {
   onShow: () => void;
 }
 
-export function FindingCard({ index, finding: f, info, located, active, note, onReplace, onAppend, onShow }: Props) {
+export function FindingCard({ index, finding: f, info, located, active, note, onReplace, onAppend, onShow, children }: Props) {
   const [copied, setCopied] = useState(false);
 
   const copy = async () => {
@@ -99,6 +101,7 @@ export function FindingCard({ index, finding: f, info, located, active, note, on
       ) : (
         <p className="mt-3 text-sm text-muted">No automatic fix for this one. Use the guidance above to reword it.</p>
       )}
+      {children}
     </li>
   );
 }

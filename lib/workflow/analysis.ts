@@ -1,7 +1,9 @@
 import { createHash } from "node:crypto";
 import { eq, inArray } from "drizzle-orm";
 import { DEFAULT_MODEL } from "@/lib/compliance/claude";
-import { analyzeAsset, type EngineResult } from "@/lib/compliance/engine";
+import { analyzeAsset, type EngineOptions, type EngineResult } from "@/lib/compliance/engine";
+import type { NetImpression } from "@/lib/compliance/feature-types";
+import { readNetImpression } from "@/lib/compliance/net-impression";
 import { PROMPT_VERSION } from "@/lib/compliance/prompt";
 import { computeRisk, recommend } from "@/lib/compliance/risk";
 import type { AssetContext, RuleDef } from "@/lib/compliance/types";
@@ -25,7 +27,14 @@ export async function partnerRejectionRate(partnerId: number | null): Promise<nu
   return approved + rejected >= 3 ? rejected / (approved + rejected) : undefined;
 }
 
-function cacheKey(ctx: AssetContext, rules: RuleDef[], facts: unknown): string {
+/** An uploaded file as the analysis needs it. `sha256` is of the raw bytes. */
+export interface AnalysisFile {
+  mediaType: NonNullable<EngineOptions["image"]>["mediaType"];
+  base64: string;
+  sha256: string;
+}
+
+function cacheKey(ctx: AssetContext, rules: RuleDef[], facts: unknown, file: AnalysisFile | null): string {
   const rulesFp = sha(JSON.stringify(rules.map((r) => [r.code, r.severity, r.enabled, r.aiReview, r.checkInstruction, r.config])));
   return sha(
     JSON.stringify([
@@ -39,26 +48,52 @@ function cacheKey(ctx: AssetContext, rules: RuleDef[], facts: unknown): string {
       [...ctx.states].sort(),
       ctx.isAffiliate,
       ctx.content,
+      // Appended only for files so existing text-only keys (and the warmed example cache) stay valid.
+      // The file hash keeps two file-only assets with no typed text from ever sharing a result.
+      ...(file ? [["file-v1", file.mediaType, file.sha256]] : []),
     ]),
   );
 }
 
 /**
  * Runs the hybrid engine against the live rules library, reusing a cached result when the same
- * text was already analysed under the same rules. Only complete (rules + AI) results are cached, so
+ * text (and file) was already analysed under the same rules. Only complete (rules + AI) results are cached, so
  * a transient AI outage is never frozen in. Risk is always recomputed with the partner's record.
  */
-export async function analyzeForSubmission(ctx: AssetContext, partnerId: number | null, userId: number | null = null) {
+export async function analyzeForSubmission(ctx: AssetContext, partnerId: number | null, userId: number | null = null, file: AnalysisFile | null = null) {
   const [rules, facts, rate] = await Promise.all([loadRules(), loadFacts(ctx.product), partnerRejectionRate(partnerId)]);
-  const key = cacheKey(ctx, rules, facts);
+  const key = cacheKey(ctx, rules, facts, file);
 
-  let result: EngineResult | null = null;
+  type Cached = EngineResult & { netImpression?: NetImpression | null };
+  let result: Cached | null = null;
   const [hit] = await db.select().from(tables.analysisCache).where(eq(tables.analysisCache.key, key));
-  if (hit) result = hit.result as EngineResult;
+  if (hit) result = hit.result as Cached;
+
+  // Results cached before the consumer read existed: add it once and save it back to the cache.
+  if (result && !("netImpression" in result)) {
+    const budget = await reserveAiCall(userId);
+    const impression = budget.ok
+      ? await readNetImpression(ctx, facts, { image: file ? { mediaType: file.mediaType, base64: file.base64 } : undefined }).catch(() => null)
+      : null;
+    result = { ...result, netImpression: impression };
+    if (impression) await db.update(tables.analysisCache).set({ result }).where(eq(tables.analysisCache.key, key));
+  }
 
   if (!result) {
     const budget = await reserveAiCall(userId);
-    result = await analyzeAsset(ctx, { rules, facts, skipAi: !budget.ok, skipReason: budget.ok ? undefined : budget.reason });
+    const image = file ? { mediaType: file.mediaType, base64: file.base64 } : undefined;
+    // The consumer read does not depend on the main analysis, so both run at once. It is advisory:
+    // if it fails, the analysis still stands without it.
+    const [engine, impression] = await Promise.all([
+      analyzeAsset(ctx, { rules, facts, image, skipAi: !budget.ok, skipReason: budget.ok ? undefined : budget.reason }),
+      budget.ok
+        ? readNetImpression(ctx, facts, { image }).catch((err: unknown) => {
+            console.warn("Net-impression read unavailable:", err instanceof Error ? err.message : err);
+            return null;
+          })
+        : Promise.resolve(null),
+    ]);
+    result = { ...engine, netImpression: impression };
     if (result.status === "complete") {
       await db
         .insert(tables.analysisCache)
@@ -67,12 +102,14 @@ export async function analyzeForSubmission(ctx: AssetContext, partnerId: number 
     }
   }
 
+  if (!result) throw new Error("analysis produced no result");
   const risk = computeRisk(result.findings, ctx, rate);
-  const final: EngineResult = { ...result, riskScore: risk.score, riskLevel: risk.level, recommendation: recommend(result.findings) };
+  const { netImpression = null, ...engineResult } = result;
+  const final: EngineResult = { ...engineResult, riskScore: risk.score, riskLevel: risk.level, recommendation: recommend(result.findings) };
   const ruleInfo = Object.fromEntries(
     rules.map((r): [string, RuleInfo] => [r.code, { code: r.code, title: r.title, category: r.category, citation: r.citation, guidance: r.guidance }]),
   );
-  return { analysis: final, ruleInfo, cached: Boolean(hit) };
+  return { analysis: final, ruleInfo, cached: Boolean(hit), netImpression, facts };
 }
 
 export async function ruleInfoFor(codes: string[]): Promise<Record<string, RuleInfo>> {

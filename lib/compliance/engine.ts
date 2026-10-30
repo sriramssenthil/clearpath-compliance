@@ -3,12 +3,14 @@ import { selectAiRules } from "./applicable";
 import { AiAnalysisError, analyzeWithClaude, type ClaudeOptions, type ClaudeResult } from "./claude";
 import { runDeterministic } from "./deterministic";
 import { mergeFindings, type DroppedAi } from "./merge";
+import { buildCombinedContent } from "@/lib/workflow/assets";
 import { computeRisk, recommend } from "./risk";
 import type { AnalysisResult, AssetContext, DraftFinding, ProductFacts, RuleDef } from "./types";
 
 export interface EngineOptions {
   rules: RuleDef[];
   facts: ProductFacts;
+  /** Uploaded image or PDF. `ctx.content` is then the typed copy only (may be empty). */
   image?: ClaudeOptions["image"];
   partnerRejectionRate?: number;
   /** Rules-only mode: no model call. Used by tests, the eval baseline and the "AI unavailable" path. */
@@ -25,7 +27,7 @@ export interface EngineResult extends AnalysisResult {
   latencyMs: number;
   /** Computed in code from the findings; the model never decides this. */
   recommendation: "ready" | "needs_changes";
-  /** The text the findings' offsets refer to (the transcription, for image input). */
+  /** The text the findings' offsets refer to: for file input, the transcription, then COPY_SEPARATOR and the typed copy. */
   content: string;
 }
 
@@ -44,7 +46,7 @@ export async function analyzeAsset(ctx: AssetContext, opts: EngineOptions): Prom
   let content = ctx.content;
   let deterministic: DraftFinding[] = [];
 
-  // Image input has no text until the model transcribes it, so the model must run first.
+  // File input has no text until the model transcribes it, so the model must run first.
   const needsTranscription = Boolean(opts.image);
   if (!needsTranscription) deterministic = runDeterministic(ctx, opts.rules, opts.facts);
 
@@ -61,7 +63,8 @@ export async function analyzeAsset(ctx: AssetContext, opts: EngineOptions): Prom
   }
 
   if (needsTranscription) {
-    content = ai?.extractedText ?? "";
+    content = buildCombinedContent(ai?.extractedText ?? null, ctx.content, true);
+    if (!ai) aiNote = `${aiNote} The file's text could not be read without the AI step, so only the typed copy was checked.`;
     deterministic = runDeterministic({ ...ctx, content }, opts.rules, opts.facts);
   }
 
@@ -77,7 +80,8 @@ export async function analyzeAsset(ctx: AssetContext, opts: EngineOptions): Prom
   return {
     findings: merged.findings,
     summary,
-    extractedText: ai?.extractedText ?? null,
+    // For file input with a working AI step this is never null, which is how the UI knows the content has a transcription part.
+    extractedText: needsTranscription && ai ? (ai.extractedText ?? "") : null,
     status: ai ? "complete" : "rules_only",
     model: ai?.model ?? null,
     riskScore: risk.score,

@@ -26,11 +26,15 @@ interface Props {
   onRun: () => void;
   /** Optional slot above the editor, e.g. the "load an example" menu. */
   toolbar?: ReactNode;
+  /** The file uploader, shown above the text box. */
+  fileSlot?: ReactNode;
+  /** A file is attached, so the text box becomes optional accompanying copy. */
+  hasFile?: boolean;
   id?: string;
 }
 
 export const AssetEditor = forwardRef<HTMLTextAreaElement, Props>(function AssetEditor(
-  { value, onChange, disabled, error, view, onViewChange, canHighlight, highlightHint, highlighted, running, hasResult, canRun, onRun, toolbar, id = "asset-content" },
+  { value, onChange, disabled, error, view, onViewChange, canHighlight, highlightHint, highlighted, running, hasResult, canRun, onRun, toolbar, fileSlot, hasFile = false, id = "asset-content" },
   ref,
 ) {
   const over = value.length > MAX_CONTENT;
@@ -57,18 +61,29 @@ export const AssetEditor = forwardRef<HTMLTextAreaElement, Props>(function Asset
       <CardHeader>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle>
-              <label htmlFor={id}>Asset text</label>
-            </CardTitle>
+            <CardTitle>Asset</CardTitle>
             <CardDescription className="mt-1 max-w-prose">
-              Paste the full text of the asset. For images, paste the text version: that text is what gets checked. The check reads the whole
-              text, including footnotes and fine print.
+              Upload the ad as an image or PDF, paste its text, or both (for example a banner and its caption). The check reads everything,
+              including footnotes and fine print, and the text it reads from your file is shown with the results.
             </CardDescription>
           </div>
           {toolbar}
         </div>
       </CardHeader>
       <CardBody className="space-y-3">
+        {fileSlot}
+        <div className="flex flex-wrap items-end justify-between gap-2 pt-1">
+          <label htmlFor={id} className="text-sm font-medium">
+            {hasFile ? (
+              <>
+                Caption or accompanying copy <span className="font-normal text-subtle">(optional)</span>
+              </>
+            ) : (
+              "Asset text"
+            )}
+          </label>
+          {!hasFile ? <span className="text-xs text-muted">Required unless you attach a file</span> : null}
+        </div>
         <div role="tablist" aria-label="Text view" className="inline-flex gap-1 rounded-lg bg-surface-muted p-1">
           {tab("edit", "Edit")}
           {tab("highlight", "Highlight findings", !canHighlight)}
@@ -84,9 +99,15 @@ export const AssetEditor = forwardRef<HTMLTextAreaElement, Props>(function Asset
             spellCheck
             aria-invalid={Boolean(error) || over}
             aria-describedby={`${id}-meta`}
-            placeholder="Paste or type the ad copy, email body, landing page text, SMS or social post here."
+            aria-required={!hasFile}
+            placeholder={
+              hasFile
+                ? "Text that runs with the file, such as a social caption, email subject line or alt text. Leave empty if the file is the whole ad."
+                : "Paste or type the ad copy, email body, landing page text, SMS or social post here."
+            }
             className={cn(
-              "block min-h-[24rem] w-full resize-y rounded-md border bg-surface px-3 py-2.5 text-sm leading-7",
+              "block w-full resize-y rounded-md border bg-surface px-3 py-2.5 text-sm leading-7",
+              hasFile ? "min-h-[10rem]" : "min-h-[24rem]",
               error || over ? "border-danger" : "border-border-strong",
             )}
           />

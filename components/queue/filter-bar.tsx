@@ -39,6 +39,7 @@ export function FilterBar({ view, partners, activeCount }: { view: QueueView; pa
       channel: get("channel") as QueueView["channel"],
       partner: get("partner") ? Number(get("partner")) : null,
       q: get("q").trim(),
+      sort: view.sort,
     };
     start(() => router.push(queueHref(next)));
   }
@@ -121,7 +122,7 @@ export function FilterBar({ view, partners, activeCount }: { view: QueueView; pa
           Apply
         </Button>
         {activeCount > 0 ? (
-          <Link href={queueHref({ status: view.status })} className={buttonVariants({ variant: "ghost", size: "md" })}>
+          <Link href={queueHref({ status: view.status, sort: view.sort })} className={buttonVariants({ variant: "ghost", size: "md" })}>
             Clear ({activeCount})
           </Link>
         ) : null}

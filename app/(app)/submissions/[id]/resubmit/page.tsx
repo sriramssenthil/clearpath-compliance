@@ -46,7 +46,7 @@ export default async function ResubmitPage({ params }: { params: Promise<{ id: s
         </Link>
         <h1 className="mt-2 text-2xl font-medium tracking-tight">Submit a new version</h1>
         <p className="mt-1 max-w-2xl text-sm text-muted">
-          {detail.code} is waiting on you. Work through the feedback below, edit the text, check it, then send it back. Version {detail.currentVersion + 1} gets a
+          {detail.code} is waiting on you. Work through the feedback below, edit the text or upload a corrected file, check it, then send it back. Version {detail.currentVersion + 1} gets a
           faster review than a first submission.
         </p>
       </div>
@@ -94,7 +94,8 @@ export default async function ResubmitPage({ params }: { params: Promise<{ id: s
         product={detail.product}
         channel={detail.channel}
         states={detail.states}
-        initialContent={version.content}
+        initialContent={version.inputText ?? (version.asset ? "" : version.content)}
+        currentAsset={version.asset}
       />
     </div>
   );

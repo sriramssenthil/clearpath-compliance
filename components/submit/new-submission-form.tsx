@@ -11,6 +11,8 @@ import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/compon
 import { cn } from "@/lib/utils";
 import { createSubmissionAction, precheckAction } from "@/app/(app)/submissions/actions";
 import { ExampleMenu } from "./example-menu";
+import { FileDrop } from "./file-drop";
+import { fileKey, prepareFile, toFormData, type PreparedFile } from "./prepare-file";
 import { Field, INPUT_CLASS } from "./field";
 import { CHANNEL_LABEL, MAX_CONTENT, MIN_CONTENT, PRODUCT_LABEL } from "./options";
 import { StatePicker } from "./state-picker";
@@ -63,12 +65,20 @@ type Errors = Partial<Record<"title" | "content" | "priorityReason" | "form", st
 /** Maps the service's first validation message to the field it is about. */
 function fieldFor(message: string): keyof Errors {
   if (/title/i.test(message)) return "title";
-  if (/asset text|sentence/i.test(message)) return "content";
+  if (/asset text|sentence|file|PDF|image|character limit/i.test(message)) return "content";
   if (/expedited|reason/i.test(message)) return "priorityReason";
   return "form";
 }
 
-export function NewSubmissionForm({ userId, role }: { userId: number; role: Role }) {
+export interface MasterOption {
+  id: number;
+  code: string;
+  title: string;
+  product: string;
+}
+
+export function NewSubmissionForm({ userId, role, masters = [] }: { userId: number; role: Role; masters?: MasterOption[] }) {
+  const [parentId, setParentId] = useState<number | null>(null);
   const router = useRouter();
   const [f, setF] = useState<Draft>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
@@ -76,8 +86,10 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
   const [exampleNote, setExampleNote] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [file, setFile] = useState<PreparedFile | null>(null);
+  const [exampleLoading, setExampleLoading] = useState(false);
   const hydrated = useRef(false);
-  const pre = usePrecheck((content) => precheckAction({ product: f.product, channel: f.channel, states: f.states, content }));
+  const pre = usePrecheck((content) => precheckAction({ product: f.product, channel: f.channel, states: f.states, content }, toFormData(file)));
   const resetPre = pre.reset;
 
   // Restore after mount (localStorage does not exist on the server); then keep it saved.
@@ -112,8 +124,30 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
     setErrors((e) => (e[key as keyof Errors] || e.form ? { ...e, [key]: undefined, form: undefined } : e));
   };
 
-  const loadExample = (ex: ExampleAsset) => {
+  const changeFile = (next: PreparedFile | null) => {
+    setFile(next);
+    setConfirmOpen(false);
+    setErrors((e) => (e.content || e.form ? { ...e, content: undefined, form: undefined } : e));
+  };
+
+  const loadExample = async (ex: ExampleAsset) => {
     setF((prev) => ({ ...prev, title: ex.title, product: ex.product, channel: ex.channel, states: [...ex.states], content: ex.content }));
+    if (file) URL.revokeObjectURL(file.previewUrl);
+    setFile(null);
+    if (ex.image) {
+      // Image examples load the real file into the uploader, exactly as if it had been dropped in.
+      setExampleLoading(true);
+      try {
+        const blob = await fetch(ex.image.src).then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))));
+        const res = await prepareFile(new File([blob], ex.image.filename, { type: blob.type }));
+        if (res.ok) setFile(res.file);
+        else setErrors({ content: res.error });
+      } catch {
+        setErrors({ content: "The example image could not be loaded. Try again, or pick another example." });
+      } finally {
+        setExampleLoading(false);
+      }
+    }
     resetPre();
     setErrors({});
     setConfirmOpen(false);
@@ -130,6 +164,8 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
 
   const discard = () => {
     setF(EMPTY);
+    if (file) URL.revokeObjectURL(file.previewUrl);
+    setFile(null);
     resetPre();
     setErrors({});
     setConfirmOpen(false);
@@ -143,7 +179,7 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
   };
 
   const analysis = pre.result?.analysis ?? null;
-  const contextKey = JSON.stringify([f.product, f.channel, f.states]);
+  const contextKey = JSON.stringify([f.product, f.channel, f.states, fileKey(file)]);
   const stale = isStale(pre, f.content, contextKey);
   const flagged = analysis?.findings.length ?? 0;
   const items = (n: number) => `${n} ${n === 1 ? "item" : "items"}`;
@@ -158,7 +194,7 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
     const e: Errors = {};
     if (f.title.trim().length < 3) e.title = "Give the submission a title (3+ characters).";
     const len = f.content.trim().length;
-    if (len < MIN_CONTENT) e.content = "Paste at least a sentence or two of the asset text.";
+    if (!file && len < MIN_CONTENT) e.content = "Paste at least a sentence or two of the asset text, or attach the ad as an image or PDF.";
     else if (len > MAX_CONTENT) e.content = `The text is over the ${MAX_CONTENT.toLocaleString("en-US")} character limit.`;
     if (f.priority === "expedited" && !f.priorityReason.trim()) e.priorityReason = "Expedited reviews need a reason (for example a launch date).";
     return e;
@@ -176,7 +212,8 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
       priority: f.priority,
       priorityReason: f.priority === "expedited" ? f.priorityReason : null,
       notes: f.notes.trim() || null,
-    }).catch(() => ({ ok: false as const, error: "Could not reach the server. Your draft is safe; try again." }));
+      parentId: masters.some((m) => m.id === parentId && m.product === f.product) ? parentId : null,
+    }, toFormData(file)).catch(() => ({ ok: false as const, error: "Could not reach the server. Your draft is safe; try again." }));
     if (!res.ok) {
       setSubmitting(false);
       setConfirmOpen(false);
@@ -202,7 +239,7 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
     else void send();
   };
 
-  const pristine = isBlank(f) && !restored;
+  const pristine = isBlank(f) && !restored && !file && !exampleLoading;
   const fieldIssue = errors.title || errors.priorityReason || errors.content;
 
   return (
@@ -216,7 +253,7 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
               <p className="mt-0.5 text-sm text-muted">It fills in the form with realistic copy that has a few typical problems. Nothing is sent until you submit.</p>
             </div>
           </div>
-          <ExampleMenu onPick={loadExample} variant="primary" />
+          <ExampleMenu onPick={(ex) => void loadExample(ex)} variant="primary" />
         </div>
       ) : null}
 
@@ -314,6 +351,31 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
           <Field label="Notes for the reviewer" htmlFor="notes" optional hint="Context that is not in the text: audience, where it appears, what changed since the last approved version." className="md:col-span-6">
             <textarea id="notes" rows={3} maxLength={2000} className={cn(INPUT_CLASS, "h-auto py-2")} value={f.notes} onChange={(e) => set("notes", e.target.value)} />
           </Field>
+          {masters.some((m) => m.product === f.product) ? (
+            <Field
+              label="Variant of an approved asset"
+              htmlFor="parent"
+              optional
+              hint="Pick the approved master if this is a campaign variant. When only greetings, names or button labels differ, compliance can fast-track it."
+              className="md:col-span-6"
+            >
+              <select
+                id="parent"
+                className={INPUT_CLASS}
+                value={parentId !== null && masters.some((m) => m.id === parentId && m.product === f.product) ? String(parentId) : ""}
+                onChange={(e) => setParentId(e.target.value ? Number(e.target.value) : null)}
+              >
+                <option value="">Not a variant</option>
+                {masters
+                  .filter((m) => m.product === f.product)
+                  .map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.code}: {m.title}
+                    </option>
+                  ))}
+              </select>
+            </Field>
+          ) : null}
         </CardBody>
       </Card>
 
@@ -331,7 +393,17 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
         disabled={submitting}
         textError={errors.content}
         contextKey={contextKey}
-        toolbar={pristine ? undefined : <ExampleMenu onPick={loadExample} disabled={submitting} />}
+        toolbar={pristine ? undefined : <ExampleMenu onPick={(ex) => void loadExample(ex)} disabled={submitting || exampleLoading} />}
+        hasFile={Boolean(file)}
+        fileSlot={
+          exampleLoading ? (
+            <p role="status" className="rounded-md border border-dashed border-border-strong px-4 py-6 text-center text-sm text-muted">
+              Loading the example image...
+            </p>
+          ) : (
+            <FileDrop value={file} onChange={changeFile} disabled={submitting} />
+          )
+        }
       />
 
       <SubmitBar
@@ -347,7 +419,7 @@ export function NewSubmissionForm({ userId, role }: { userId: number; role: Role
         left={
           isBlank(f) ? null : (
             <span className="flex items-center gap-3">
-              Draft saved on this device
+              Draft saved on this device{file ? " (the attached file is not saved with it)" : ""}
               <button type="button" onClick={discard} disabled={submitting} className="font-medium text-muted underline underline-offset-2 hover:text-foreground">
                 Discard draft
               </button>

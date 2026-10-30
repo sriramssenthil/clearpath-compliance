@@ -27,6 +27,10 @@ export const PARTNER_PROFILE: Record<PartnerName, "bad" | "clean" | "mixed"> = {
   "Dollar Dispatch": "mixed",
 };
 
+/**
+ * Every seeded user is a demo persona (users.is_demo = true): passwordless, enterable with one click
+ * from the landing page while DEMO_MODE is on, and unable to sign in with a password.
+ */
 export interface SeedUser {
   name: string;
   email: string;

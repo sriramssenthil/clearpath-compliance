@@ -62,7 +62,10 @@ interface Spec {
   rv: string;
   pri?: string;
   notes?: string;
+  /** Target launch, in days after submission; null = none given. Omitted = a realistic random date. */
   launch?: number | null;
+  /** Target launch in days from now (negative = already passed): pins the live-queue launch stories. */
+  launchIn?: number;
   wdAfterCr?: boolean;
   wdReason?: string;
   v: VSpec[];
@@ -669,6 +672,7 @@ Ready to apply? Start at https://clearpath.example/apply?partner=raterover&subid
     by: "Jordan Ellis",
     start: { live: { ideal: 82, min: 74, max: 120 } },
     final: "submitted",
+    launchIn: -1,
     rv: "",
     v: [
       {
@@ -1247,6 +1251,7 @@ Check your rate: https://clearpath.example/loans?ref=leadharbor`,
     by: "Mara Lindqvist",
     start: { live: { ideal: 17, min: 13, max: 23 } },
     final: "submitted",
+    launchIn: 1,
     rv: "",
     pri: "Holiday campaign goes live Friday morning and the influencer post is already scheduled.",
     v: [
@@ -1375,6 +1380,7 @@ Unsubscribe here if you would rather not get sponsor emails.`,
     by: "Owen Gallagher",
     start: { live: { ideal: 31, min: 26, max: 60 } },
     final: "submitted",
+    launchIn: 1,
     rv: "",
     pri: "Promotion ends Friday and the send is scheduled for tomorrow morning.",
     v: [
@@ -2148,9 +2154,16 @@ async function realize(spec: Spec, index: number, env: Env): Promise<SubM> {
   sub.updatedAt = result.events[result.events.length - 1].at;
   const lrng = mulberry32(hashString(spec.key) ^ 0x1234567);
   const roll = lrng();
-  const days = spec.launch ?? (expedited ? 1 + Math.floor(lrng() * 3) : 4 + Math.floor(lrng() * 12));
-  if (spec.launch !== null && !(spec.launch === undefined && roll > 0.7)) {
-    const t = new Date(result.S[0].getTime() + days * DAY);
+  // Most submitters name a launch: 3-21 days out for standard work, 1-3 days for expedited. A resubmission still
+  // waiting on compliance counts from its latest version (the launch moved), so only the pinned story is late.
+  const launchBase = spec.final === "submitted" || spec.final === "in_review" ? result.S[lastIdx] : result.S[0];
+  const days = spec.launch ?? (expedited ? 1 + Math.floor(lrng() * 3) : 3 + Math.floor(lrng() * 19));
+  const launchAt =
+    spec.launchIn !== undefined ? now.getTime() + spec.launchIn * DAY
+    : spec.launch !== null && !(spec.launch === undefined && roll > 0.85) ? launchBase.getTime() + days * DAY
+    : null;
+  if (launchAt !== null) {
+    const t = new Date(launchAt);
     sub.launchDate = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), t.getUTCDate()));
   }
   const lastV = sub.versions[lastIdx];

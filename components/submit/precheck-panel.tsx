@@ -1,11 +1,14 @@
 "use client";
 
-import { AlertCircle, CheckCircle2, Info, RefreshCw, TriangleAlert } from "lucide-react";
+import type { ReactNode } from "react";
+import { AlertCircle, CheckCircle2, FileText, Info, RefreshCw, TriangleAlert } from "lucide-react";
 import type { AnchoredFinding } from "@/lib/compliance/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { FindingCard } from "./finding-card";
+import { PrecedentHint } from "./precedent-hint";
+import { NetImpressionCard } from "@/components/review/net-impression-card";
 import { validSpan } from "./segments";
 import { STAGES, type PrecheckHandle } from "./use-precheck";
 
@@ -21,6 +24,10 @@ interface Props {
   onReplace: (index: number) => void;
   onAppend: (index: number) => void;
   onShow: (index: number) => void;
+  /** The transcription of the uploaded file, already highlighted. Null for text-only results. */
+  fileText?: ReactNode;
+  /** The file was read but no text was found in it. */
+  fileTextEmpty?: boolean;
 }
 
 const SEV_ORDER = ["high", "medium", "low"] as const;
@@ -43,7 +50,7 @@ function Progress({ stage }: { stage: number }) {
   );
 }
 
-export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, onRun, onReplace, onAppend, onShow }: Props) {
+export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, onRun, onReplace, onAppend, onShow, fileText, fileTextEmpty }: Props) {
   const { phase, result, error } = pre;
   const analysis = result?.analysis;
   const running = phase === "running";
@@ -63,7 +70,9 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
       onReplace={() => onReplace(i)}
       onAppend={() => onAppend(i)}
       onShow={() => onShow(i)}
-    />
+    >
+      <PrecedentHint matches={result?.precedents?.[analysis?.findings.indexOf(f) ?? -1]} className="mt-3" />
+    </FindingCard>
   );
 
   return (
@@ -78,7 +87,7 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
         {phase === "idle" && !result ? (
           <p className="text-sm text-muted">
             Run the pre-check to see which rules apply to this product, channel and state, with the exact text each finding refers to and a suggested fix.
-            {!canRun ? " Add the asset text first." : ""}
+            {!canRun ? " Attach the ad file or add the asset text first." : ""}
           </p>
         ) : null}
 
@@ -141,6 +150,23 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
               <p className="mt-0.5 text-xs text-muted">This pre-check is advisory. Compliance makes the final call.</p>
             </div>
 
+            {fileText || fileTextEmpty ? (
+              <section aria-labelledby="file-text-heading" className="space-y-2">
+                <h4 id="file-text-heading" className="flex items-center gap-2 text-sm font-medium">
+                  <FileText aria-hidden className="size-4 text-muted" />
+                  Text read from your file
+                </h4>
+                <p className="text-xs text-muted">
+                  Transcribed by the AI checker; this is the text the rules were run on. If something was misread, compliance still reviews the original file.
+                </p>
+                {fileTextEmpty ? (
+                  <p className="rounded-md border border-dashed border-border-strong px-3 py-3 text-sm text-muted">No text was found in the file.</p>
+                ) : (
+                  fileText
+                )}
+              </section>
+            ) : null}
+
             {sorted.length > 0 ? (
               <>
                 <p className="text-xs text-muted">
@@ -159,6 +185,8 @@ export function PrecheckPanel({ pre, sorted, stale, canRun, activeKey, notes, on
                 ) : null}
               </>
             ) : null}
+
+            {result?.netImpression && !stale ? <NetImpressionCard impression={result.netImpression} facts={result.facts} /> : null}
           </div>
         ) : null}
       </CardBody>

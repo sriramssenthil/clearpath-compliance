@@ -20,6 +20,7 @@ export interface QueueView {
   channel: "" | Channel;
   partner: number | null;
   q: string;
+  sort: "priority" | "deadline";
 }
 
 type Raw = Record<string, string | string[] | undefined>;
@@ -37,6 +38,7 @@ export function parseQueueView(raw: Raw): QueueView {
     channel: oneOf(first(raw.channel), CHANNELS),
     partner,
     q: first(raw.q).trim().slice(0, 80),
+    sort: oneOf(first(raw.sort), ["deadline"] as const) || "priority",
   };
 }
 
@@ -53,7 +55,7 @@ export function toQueueFilters(v: QueueView): QueueFilters {
   };
 }
 
-/** Number of filters narrowing the list (the status view does not count). */
+/** Number of filters narrowing the list (the status view and sort do not count). */
 export function activeFilterCount(v: QueueView): number {
   return [v.assignee !== "all", v.risk, v.product, v.channel, v.partner !== null, v.q].filter(Boolean).length;
 }
@@ -68,6 +70,7 @@ export function queueHref(v: Partial<QueueView>): string {
   if (v.channel) p.set("channel", v.channel);
   if (v.partner) p.set("partner", String(v.partner));
   if (v.q) p.set("q", v.q);
+  if (v.sort === "deadline") p.set("sort", "deadline");
   const s = p.toString();
   return s ? `/queue?${s}` : "/queue";
 }

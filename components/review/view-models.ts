@@ -2,11 +2,17 @@ import type { FindingView } from "@/lib/workflow/types";
 import { formatDateTime, relativeTime } from "./format";
 
 /** A finding plus pre-rendered time labels, so client components never format "now" themselves (no hydration drift). */
-export type FindingVM = FindingView & { actedRel: string | null; actedAbs: string | null };
+export type FindingVM = FindingView & {
+  actedRel: string | null;
+  actedAbs: string | null;
+  /** Submission code to id, so live precedents can link to their source. */
+  precedentIds?: Record<string, number>;
+};
 
-export function toFindingVM(f: FindingView, now: Date): FindingVM {
+export function toFindingVM(f: FindingView, now: Date, precedentIds?: Record<string, number>): FindingVM {
   return {
     ...f,
+    precedentIds,
     actedRel: f.actedAt ? relativeTime(f.actedAt, now) : null,
     actedAbs: f.actedAt ? formatDateTime(f.actedAt) : null,
   };

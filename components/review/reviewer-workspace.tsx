@@ -4,12 +4,14 @@ import { Keyboard } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { findingAction } from "@/app/(app)/submissions/[id]/actions";
+import type { AssetInfo } from "@/lib/compliance/feature-types";
 import type { Permissions } from "@/lib/workflow/types";
+import { AssetText, AssetViewer } from "./asset-viewer";
 import type { Status } from "@/lib/workflow/flow";
 import { AddFindingForm } from "./add-finding-form";
 import { DecisionPanel, type ClosedDecision } from "./decision-panel";
 import { FindingsPanel, matchesFilter, type AnalysisInfo } from "./findings-panel";
-import { HighlightedText, type HighlightMark, type TextSelection } from "./highlighted-text";
+import { type HighlightMark, type TextSelection } from "./highlighted-text";
 import { unlocatedIds } from "./segments";
 import type { FindingFilter, FindingVM, RuleOption } from "./view-models";
 
@@ -30,6 +32,8 @@ interface Props {
   lastDecision: ClosedDecision | null;
   /** Server-rendered diff; replaces the highlighted text while comparing. */
   diffSlot: ReactNode | null;
+  /** Uploaded file of the viewed version; its transcription is the first part of `content`. */
+  asset?: AssetInfo | null;
 }
 
 const SEV_WORD = { high: "High", medium: "Medium", low: "Low" } as const;
@@ -158,14 +162,16 @@ export function ReviewerWorkspace(p: Props) {
           <div className="rounded-lg border border-border bg-surface shadow-card">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-5 py-3">
               <h2 className="text-sm font-medium text-foreground">
-                {p.diffSlot ? `Changes in version ${p.versionNumber}` : `Asset text, version ${p.versionNumber}`}
+                {p.diffSlot ? `Changes in version ${p.versionNumber}` : `${p.asset ? "Asset file and text" : "Asset text"}, version ${p.versionNumber}`}
               </h2>
               {!p.diffSlot ? <MarkLegend /> : null}
             </div>
-            <div className="px-5 py-5 sm:px-8">
+            <div className="space-y-6 px-5 py-5 sm:px-8">
+              {p.asset ? <AssetViewer asset={p.asset} className="mx-auto max-w-[68ch]" /> : null}
               {p.diffSlot ?? (
-                <HighlightedText
+                <AssetText
                   content={p.content}
+                  hasFile={Boolean(p.asset)}
                   marks={marks}
                   selectedId={selectedId}
                   pulseKey={tick}

@@ -13,7 +13,14 @@ import { toFindingVM, type RuleOption } from "@/components/review/view-models";
 import { VersionDiff } from "@/components/review/version-diff";
 import { WithdrawControl } from "@/components/review/withdraw-control";
 import { buttonVariants } from "@/components/ui/button";
-import { loadRules } from "@/lib/data/reference";
+import { ChangeScopePanel } from "@/components/review/change-scope-panel";
+import { NetImpressionCard } from "@/components/review/net-impression-card";
+import { VariantsPanel } from "@/components/review/variants-panel";
+import { factsForDisplay } from "@/lib/compliance/net-impression";
+import { loadFacts, loadRules } from "@/lib/data/reference";
+import { attachPrecedents, loadPrecedentData } from "@/lib/workflow/precedents";
+import { changeScopeForVersion, variantsOf } from "@/lib/workflow/variants";
+import { approveVariantsAction } from "./actions";
 import { canReview } from "@/lib/workflow/flow";
 import { currentActor } from "@/lib/workflow/action-helpers";
 import { getDetail } from "@/lib/workflow/queries";
@@ -49,7 +56,17 @@ export default async function SubmissionPage({ params, searchParams }: { params:
   const resubmitted = /^\d{1,4}$/.test(first(sp.resubmitted) ?? "") ? Number(first(sp.resubmitted)) : null;
 
   const reviewerSide = canReview(actor.role) || detail.permissions.canActOnFindings;
-  const viewedFindings = viewed.findings.map((f) => toFindingVM(f, now));
+  // Reviewer-only enrichments: similar past decisions per finding, what changed, the consumer read, variants.
+  const [precedentData, scope, factsRows, variants] = await Promise.all([
+    reviewerSide ? loadPrecedentData() : Promise.resolve(null),
+    changeScopeForVersion({ id: detail.id, parentId: detail.parentId }, viewed),
+    loadFacts(detail.product).then(factsForDisplay),
+    detail.status === "approved" ? variantsOf(actor, detail.id) : Promise.resolve([]),
+  ]);
+  const viewedWithPrecedents = precedentData
+    ? attachPrecedents(viewed.findings, { product: detail.product, channel: detail.channel, excludeSubmissionCode: detail.code }, precedentData.corpus)
+    : viewed.findings;
+  const viewedFindings = viewedWithPrecedents.map((f) => toFindingVM(f, now, precedentData?.submissionIds));
   const latestFindings = latest.findings.map((f) => toFindingVM(f, now));
 
   const diffSlot =
@@ -106,6 +123,26 @@ export default async function SubmissionPage({ params, searchParams }: { params:
         </p>
       ) : null}
 
+      {detail.parent ? (
+        <p role="note" className="border border-border bg-surface px-4 py-3 text-sm text-muted">
+          Variant of approved master{" "}
+          <Link href={`/submissions/${detail.parent.id}`} className="text-foreground underline underline-offset-4">
+            {detail.parent.code} {detail.parent.title}
+          </Link>
+          . The change summary compares it with the master&apos;s approved text.
+        </p>
+      ) : null}
+
+      {reviewerSide && scope ? <ChangeScopePanel scope={scope} /> : null}
+
+      {reviewerSide && variants.length > 0 ? (
+        <VariantsPanel
+          variants={variants}
+          canApprove={canReview(actor.role)}
+          approveAction={approveVariantsAction.bind(null, detail.id)}
+        />
+      ) : null}
+
       {reviewerSide ? (
         <>
           <StatusBanner detail={detail} audience="reviewer" now={now} />
@@ -126,7 +163,9 @@ export default async function SubmissionPage({ params, searchParams }: { params:
             rules={rules}
             lastDecision={closedDecision}
             diffSlot={diffSlot}
+            asset={viewed.asset}
           />
+          <NetImpressionCard impression={viewed.netImpression} facts={factsRows} />
         </>
       ) : (
         <SubmitterView

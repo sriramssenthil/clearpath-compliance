@@ -2,9 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { AssetInfo } from "@/lib/compliance/feature-types";
 import type { Channel, Product } from "@/lib/compliance/types";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
-import { precheckForSubmissionAction, resubmitAction } from "@/app/(app)/submissions/actions";
+import { precheckForSubmissionAction, resubmitAction, type FileMode } from "@/app/(app)/submissions/actions";
+import { FileDrop } from "./file-drop";
+import { fileKey, toFormData, type PreparedFile } from "./prepare-file";
 import { CHANNEL_LABEL, MAX_CONTENT, MIN_CONTENT, PRODUCT_LABEL } from "./options";
 import { SubmitBar } from "./submit-bar";
 import { stateName } from "./us-states";
@@ -17,22 +20,29 @@ interface Props {
   product: Product;
   channel: Channel;
   states: string[];
+  /** The previous version's typed text (not its transcription). */
   initialContent: string;
+  /** The previous version's file, kept by default. */
+  currentAsset?: AssetInfo | null;
 }
 
-export function ResubmitForm({ submissionId, title, product, channel, states, initialContent }: Props) {
+export function ResubmitForm({ submissionId, title, product, channel, states, initialContent, currentAsset = null }: Props) {
   const router = useRouter();
   const [text, setText] = useState(initialContent);
   const [error, setError] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const pre = usePrecheck((content) => precheckForSubmissionAction(submissionId, content));
+  const [mode, setMode] = useState<FileMode>(currentAsset ? "keep" : "none");
+  const [newFile, setNewFile] = useState<PreparedFile | null>(null);
+  const pre = usePrecheck((content) => precheckForSubmissionAction(submissionId, content, mode, toFormData(mode === "new" ? newFile : null)));
 
+  const hasFile = (mode === "keep" && currentAsset !== null) || (mode === "new" && newFile !== null);
+  const contextKey = JSON.stringify([mode, fileKey(newFile)]);
   const analysis = pre.result?.analysis ?? null;
-  const stale = isStale(pre, text);
+  const stale = isStale(pre, text, contextKey);
   const flagged = analysis?.findings.length ?? 0;
-  const unchanged = text.trim() === initialContent.trim();
-  const tooShort = text.trim().length < MIN_CONTENT;
+  const unchanged = text.trim() === initialContent.trim() && (currentAsset ? mode === "keep" : mode !== "new");
+  const tooShort = !hasFile && text.trim().length < MIN_CONTENT;
   const tooLong = text.length > MAX_CONTENT;
   const items = (n: number) => `${n} ${n === 1 ? "item" : "items"}`;
 
@@ -51,7 +61,7 @@ export function ResubmitForm({ submissionId, title, product, channel, states, in
 
   const send = async () => {
     setSubmitting(true);
-    const res = await resubmitAction(submissionId, text).catch(() => ({ ok: false as const, error: "Could not reach the server. Your edits are still here; try again." }));
+    const res = await resubmitAction(submissionId, text, mode, toFormData(mode === "new" ? newFile : null)).catch(() => ({ ok: false as const, error: "Could not reach the server. Your edits are still here; try again." }));
     if (!res.ok) {
       setSubmitting(false);
       setConfirmOpen(false);
@@ -62,8 +72,13 @@ export function ResubmitForm({ submissionId, title, product, channel, states, in
   };
 
   const onSubmit = () => {
-    if (unchanged) return setError("The text is identical to the version compliance reviewed. Make your changes before resubmitting.");
-    if (tooShort) return setError("Paste at least a sentence or two of the asset text.");
+    if (unchanged)
+      return setError(
+        currentAsset
+          ? "The text and the file are identical to the version compliance reviewed. Make your changes before resubmitting."
+          : "The text is identical to the version compliance reviewed. Make your changes before resubmitting.",
+      );
+    if (tooShort) return setError("Paste at least a sentence or two of the asset text, or attach the ad as an image or PDF.");
     if (tooLong) return setError(`The text is over the ${MAX_CONTENT.toLocaleString("en-US")} character limit.`);
     if (analysis && (stale || flagged > 0)) setConfirmOpen(true);
     else void send();
@@ -94,7 +109,52 @@ export function ResubmitForm({ submissionId, title, product, channel, states, in
         </CardBody>
       </Card>
 
-      <Workspace text={text} onTextChange={onText} pre={pre} disabled={submitting} />
+      <Workspace
+        text={text}
+        onTextChange={onText}
+        pre={pre}
+        disabled={submitting}
+        contextKey={contextKey}
+        hasFile={hasFile}
+        fileSlot={
+          <div className="space-y-2">
+            <FileDrop
+              value={mode === "new" ? newFile : null}
+              onChange={(f) => {
+                setNewFile(f);
+                setMode(f ? "new" : "none");
+                setError(null);
+                setConfirmOpen(false);
+              }}
+              disabled={submitting}
+              kept={mode === "keep" && currentAsset ? { info: currentAsset, url: `/api/assets/${currentAsset.id}` } : null}
+              onRemoveKept={() => {
+                setMode("none");
+                setError(null);
+                setConfirmOpen(false);
+              }}
+            />
+            {currentAsset && mode !== "keep" ? (
+              <p className="text-xs text-muted">
+                {mode === "none" ? "The new version will have no file. " : "This file replaces the previous one. "}
+                <button
+                  type="button"
+                  className="font-medium text-accent hover:underline"
+                  disabled={submitting}
+                  onClick={() => {
+                    if (newFile) URL.revokeObjectURL(newFile.previewUrl);
+                    setNewFile(null);
+                    setMode("keep");
+                    setConfirmOpen(false);
+                  }}
+                >
+                  Keep the previous file ({currentAsset.filename})
+                </button>
+              </p>
+            ) : null}
+          </div>
+        }
+      />
 
       <SubmitBar
         label="Submit new version"
@@ -102,7 +162,7 @@ export function ResubmitForm({ submissionId, title, product, channel, states, in
         submitting={submitting}
         confirmMessage={confirmMessage}
         error={error}
-        hint={unchanged ? "Edit the text to address the feedback, then submit the new version." : analysis ? null : "Tip: run the pre-check to see which of the requested changes are fixed."}
+        hint={unchanged ? "Edit the text or replace the file to address the feedback, then submit the new version." : analysis ? null : "Tip: run the pre-check to see which of the requested changes are fixed."}
         onSubmit={onSubmit}
         onConfirm={() => void send()}
         onCancelConfirm={() => setConfirmOpen(false)}
