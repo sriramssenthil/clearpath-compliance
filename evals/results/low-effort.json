@@ -11,8 +11,8 @@
         "REGZ-16-DEFERRED",
         "UDAAP-APR"
       ],
-      "latencyMs": 2283,
-      "costUsd": 0.0053342,
+      "latencyMs": 2523,
+      "costUsd": 0.039811,
       "droppedAi": 0
     },
     {
@@ -25,8 +25,8 @@
         "REGZ-24-AVAIL",
         "UDAAP-APR"
       ],
-      "latencyMs": 5384,
-      "costUsd": 0.0121114,
+      "latencyMs": 4773,
+      "costUsd": 0.043417,
       "droppedAi": 0
     },
     {
@@ -39,8 +39,8 @@
         "MORT-EHL",
         "EMAIL-CANSPAM"
       ],
-      "latencyMs": 4084,
-      "costUsd": 0.009496600000000001,
+      "latencyMs": 4163,
+      "costUsd": 0.044315,
       "droppedAi": 0
     },
     {
@@ -51,8 +51,8 @@
         "SMS-OPTOUT",
         "REGZ-24-APR"
       ],
-      "latencyMs": 2648,
-      "costUsd": 0.005155399999999999,
+      "latencyMs": 2558,
+      "costUsd": 0.038481,
       "droppedAi": 0
     },
     {
@@ -67,8 +67,8 @@
         "CFPB-STEERING",
         "REGZ-24-APR"
       ],
-      "latencyMs": 5534,
-      "costUsd": 0.014809600000000001,
+      "latencyMs": 9911,
+      "costUsd": 0.0222296,
       "droppedAi": 0
     },
     {
@@ -80,8 +80,8 @@
       "mustNotFlag": [
         "UDAAP-GUARANTEE"
       ],
-      "latencyMs": 2252,
-      "costUsd": 0.005058399999999999,
+      "latencyMs": 2856,
+      "costUsd": 0.040944,
       "droppedAi": 0
     },
     {
@@ -93,8 +93,8 @@
         "UDAAP-GUARANTEE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 2970,
-      "costUsd": 0.0081634,
+      "latencyMs": 3276,
+      "costUsd": 0.0080634,
       "droppedAi": 1
     },
     {
@@ -106,8 +106,8 @@
         "UDAAP-GUARANTEE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 4502,
-      "costUsd": 0.0111424,
+      "latencyMs": 4921,
+      "costUsd": 0.011942399999999999,
       "droppedAi": 1
     },
     {
@@ -122,8 +122,8 @@
         "UDAAP-APR"
       ],
       "mustNotFlag": [],
-      "latencyMs": 6209,
-      "costUsd": 0.0150634,
+      "latencyMs": 5808,
+      "costUsd": 0.0142834,
       "droppedAi": 1
     },
     {
@@ -134,11 +134,12 @@
       ],
       "found": [
         "REGZ-24-APR",
-        "REGZ-24-TRIGGER"
+        "REGZ-24-TRIGGER",
+        "UDAAP-APR"
       ],
       "mustNotFlag": [],
-      "latencyMs": 4906,
-      "costUsd": 0.0127794,
+      "latencyMs": 6652,
+      "costUsd": 0.0170994,
       "droppedAi": 2
     },
     {
@@ -152,8 +153,8 @@
         "REGZ-16-TRIGGER"
       ],
       "mustNotFlag": [],
-      "latencyMs": 3334,
-      "costUsd": 0.0085102,
+      "latencyMs": 3147,
+      "costUsd": 0.0082102,
       "droppedAi": 0
     },
     {
@@ -164,13 +165,13 @@
       ],
       "found": [
         "REGZ-16-DEFERRED",
-        "REGZ-16-TRIGGER",
-        "REGZ-24-AVAIL"
+        "REGZ-16-INTRO",
+        "REGZ-16-TRIGGER"
       ],
       "mustNotFlag": [],
-      "latencyMs": 6095,
-      "costUsd": 0.015201200000000002,
-      "droppedAi": 2
+      "latencyMs": 5325,
+      "costUsd": 0.049218,
+      "droppedAi": 1
     },
     {
       "id": "13-preapproved-best-rates",
@@ -183,8 +184,8 @@
         "UDAAP-SUPERLATIVE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 4372,
-      "costUsd": 0.0106194,
+      "latencyMs": 4667,
+      "costUsd": 0.0109994,
       "droppedAi": 2
     },
     {
@@ -193,12 +194,11 @@
         "FCRA-PREQUAL"
       ],
       "found": [
-        "FCRA-PREQUAL",
-        "UDAAP-GUARANTEE"
+        "FCRA-PREQUAL"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5259,
-      "costUsd": 0.012046399999999999,
+      "latencyMs": 4227,
+      "costUsd": 0.0089464,
       "droppedAi": 0
     },
     {
@@ -207,14 +207,15 @@
         "FCRA-PRESCREEN"
       ],
       "found": [
+        "FCRA-PREQUAL",
         "FCRA-PRESCREEN"
       ],
       "mustNotFlag": [
         "EMAIL-CANSPAM",
         "FCRA-PREQUAL"
       ],
-      "latencyMs": 5421,
-      "costUsd": 0.0112662,
+      "latencyMs": 7988,
+      "costUsd": 0.018546200000000002,
       "droppedAi": 0
     },
     {
@@ -230,8 +231,8 @@
         "UDAAP-SUPERLATIVE",
         "REGZ-24-APR"
       ],
-      "latencyMs": 4150,
-      "costUsd": 0.0098136,
+      "latencyMs": 4402,
+      "costUsd": 0.0095336,
       "droppedAi": 0
     },
     {
@@ -243,9 +244,9 @@
         "FTC-AFFILIATE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5476,
-      "costUsd": 0.010805200000000001,
-      "droppedAi": 1
+      "latencyMs": 3424,
+      "costUsd": 0.0069852,
+      "droppedAi": 0
     },
     {
       "id": "18-injection-system-override",
@@ -256,8 +257,8 @@
         "SEC-INJECTION"
       ],
       "mustNotFlag": [],
-      "latencyMs": 3721,
-      "costUsd": 0.0089194,
+      "latencyMs": 3368,
+      "costUsd": 0.0084794,
       "droppedAi": 1
     },
     {
@@ -269,8 +270,8 @@
         "ECOA-DISCOURAGE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5060,
-      "costUsd": 0.0115104,
+      "latencyMs": 4910,
+      "costUsd": 0.0107304,
       "droppedAi": 0
     },
     {
@@ -284,8 +285,8 @@
         "STATE-CA-CFL"
       ],
       "mustNotFlag": [],
-      "latencyMs": 2050,
-      "costUsd": 0.0042114,
+      "latencyMs": 2211,
+      "costUsd": 0.0052114,
       "droppedAi": 0
     },
     {
@@ -301,8 +302,8 @@
         "FTC-AFFILIATE",
         "UDAAP-SUPERLATIVE"
       ],
-      "latencyMs": 5329,
-      "costUsd": 0.012681600000000001,
+      "latencyMs": 5122,
+      "costUsd": 0.0134416,
       "droppedAi": 0
     },
     {
@@ -318,8 +319,8 @@
         "REGZ-24-MORTGAGE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 3482,
-      "costUsd": 0.0087086,
+      "latencyMs": 3690,
+      "costUsd": 0.0083886,
       "droppedAi": 0
     },
     {
@@ -334,8 +335,8 @@
         "EMAIL-CANSPAM",
         "FCRA-PREQUAL"
       ],
-      "latencyMs": 3788,
-      "costUsd": 0.0082834,
+      "latencyMs": 3707,
+      "costUsd": 0.008603399999999999,
       "droppedAi": 0
     },
     {
@@ -349,8 +350,8 @@
         "UDAAP-APR"
       ],
       "mustNotFlag": [],
-      "latencyMs": 4066,
-      "costUsd": 0.0110114,
+      "latencyMs": 4408,
+      "costUsd": 0.0118114,
       "droppedAi": 0
     }
   ],
@@ -367,7 +368,7 @@
     },
     "REGZ-24-AVAIL": {
       "tp": 1,
-      "fp": 1,
+      "fp": 0,
       "fn": 0
     },
     "REGZ-24-MORTGAGE": {
@@ -382,7 +383,7 @@
     },
     "REGZ-16-INTRO": {
       "tp": 1,
-      "fp": 0,
+      "fp": 1,
       "fn": 0
     },
     "REGZ-16-DEFERRED": {
@@ -392,12 +393,12 @@
     },
     "UDAAP-APR": {
       "tp": 1,
-      "fp": 3,
+      "fp": 4,
       "fn": 0
     },
     "UDAAP-GUARANTEE": {
       "tp": 2,
-      "fp": 2,
+      "fp": 1,
       "fn": 0
     },
     "UDAAP-SUPERLATIVE": {
@@ -407,7 +408,7 @@
     },
     "FCRA-PREQUAL": {
       "tp": 2,
-      "fp": 0,
+      "fp": 1,
       "fn": 0
     },
     "FCRA-PRESCREEN": {
@@ -463,8 +464,8 @@
   },
   "summary": {
     "TP": 27,
-    "FP": 7,
+    "FP": 8,
     "FN": 0,
-    "cost": 0.2427026
+    "cost": 0.4596914
   }
 }

@@ -11,8 +11,8 @@
         "REGZ-16-DEFERRED",
         "UDAAP-APR"
       ],
-      "latencyMs": 3377,
-      "costUsd": 0.041791,
+      "latencyMs": 3033,
+      "costUsd": 0.0072342,
       "droppedAi": 0
     },
     {
@@ -25,8 +25,8 @@
         "REGZ-24-AVAIL",
         "UDAAP-APR"
       ],
-      "latencyMs": 6416,
-      "costUsd": 0.047177,
+      "latencyMs": 6119,
+      "costUsd": 0.013491399999999999,
       "droppedAi": 0
     },
     {
@@ -39,8 +39,8 @@
         "MORT-EHL",
         "EMAIL-CANSPAM"
       ],
-      "latencyMs": 5798,
-      "costUsd": 0.047395,
+      "latencyMs": 4890,
+      "costUsd": 0.0106566,
       "droppedAi": 0
     },
     {
@@ -51,8 +51,8 @@
         "SMS-OPTOUT",
         "REGZ-24-APR"
       ],
-      "latencyMs": 3559,
-      "costUsd": 0.040461,
+      "latencyMs": 3435,
+      "costUsd": 0.0067554,
       "droppedAi": 0
     },
     {
@@ -66,8 +66,8 @@
         "CFPB-STEERING",
         "REGZ-24-APR"
       ],
-      "latencyMs": 10201,
-      "costUsd": 0.060092,
+      "latencyMs": 9992,
+      "costUsd": 0.0239296,
       "droppedAi": 0
     },
     {
@@ -79,8 +79,8 @@
       "mustNotFlag": [
         "UDAAP-GUARANTEE"
       ],
-      "latencyMs": 3974,
-      "costUsd": 0.043824,
+      "latencyMs": 2697,
+      "costUsd": 0.006698399999999999,
       "droppedAi": 0
     },
     {
@@ -92,8 +92,8 @@
         "UDAAP-GUARANTEE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 3838,
-      "costUsd": 0.0092634,
+      "latencyMs": 3809,
+      "costUsd": 0.0091234,
       "droppedAi": 1
     },
     {
@@ -105,8 +105,8 @@
         "UDAAP-GUARANTEE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5631,
-      "costUsd": 0.0129824,
+      "latencyMs": 5340,
+      "costUsd": 0.0133624,
       "droppedAi": 1
     },
     {
@@ -121,8 +121,8 @@
         "UDAAP-APR"
       ],
       "mustNotFlag": [],
-      "latencyMs": 13519,
-      "costUsd": 0.030543400000000002,
+      "latencyMs": 9813,
+      "costUsd": 0.0258234,
       "droppedAi": 2
     },
     {
@@ -136,8 +136,8 @@
         "REGZ-24-TRIGGER"
       ],
       "mustNotFlag": [],
-      "latencyMs": 11930,
-      "costUsd": 0.0258794,
+      "latencyMs": 8773,
+      "costUsd": 0.0212594,
       "droppedAi": 2
     },
     {
@@ -151,8 +151,8 @@
         "REGZ-16-TRIGGER"
       ],
       "mustNotFlag": [],
-      "latencyMs": 6756,
-      "costUsd": 0.016430200000000002,
+      "latencyMs": 5828,
+      "costUsd": 0.0146102,
       "droppedAi": 0
     },
     {
@@ -163,12 +163,11 @@
       ],
       "found": [
         "REGZ-16-DEFERRED",
-        "REGZ-16-INTRO",
         "REGZ-16-TRIGGER"
       ],
       "mustNotFlag": [],
-      "latencyMs": 10377,
-      "costUsd": 0.061558,
+      "latencyMs": 7766,
+      "costUsd": 0.0179412,
       "droppedAi": 1
     },
     {
@@ -182,8 +181,8 @@
         "UDAAP-SUPERLATIVE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5122,
-      "costUsd": 0.0116994,
+      "latencyMs": 4808,
+      "costUsd": 0.0122794,
       "droppedAi": 2
     },
     {
@@ -195,8 +194,8 @@
         "FCRA-PREQUAL"
       ],
       "mustNotFlag": [],
-      "latencyMs": 6450,
-      "costUsd": 0.014726399999999999,
+      "latencyMs": 5059,
+      "costUsd": 0.012506399999999999,
       "droppedAi": 0
     },
     {
@@ -212,8 +211,8 @@
         "EMAIL-CANSPAM",
         "FCRA-PREQUAL"
       ],
-      "latencyMs": 11767,
-      "costUsd": 0.027326200000000002,
+      "latencyMs": 9430,
+      "costUsd": 0.023146200000000002,
       "droppedAi": 0
     },
     {
@@ -222,16 +221,15 @@
         "FTC-AFFILIATE"
       ],
       "found": [
-        "FTC-AFFILIATE",
-        "UDAAP-APR"
+        "FTC-AFFILIATE"
       ],
       "mustNotFlag": [
         "CFPB-STEERING",
         "UDAAP-SUPERLATIVE",
         "REGZ-24-APR"
       ],
-      "latencyMs": 9456,
-      "costUsd": 0.021073599999999998,
+      "latencyMs": 6858,
+      "costUsd": 0.0164336,
       "droppedAi": 0
     },
     {
@@ -243,8 +241,8 @@
         "FTC-AFFILIATE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 8079,
-      "costUsd": 0.016145200000000002,
+      "latencyMs": 7099,
+      "costUsd": 0.015605200000000001,
       "droppedAi": 0
     },
     {
@@ -256,8 +254,8 @@
         "SEC-INJECTION"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5758,
-      "costUsd": 0.0143194,
+      "latencyMs": 6812,
+      "costUsd": 0.0149994,
       "droppedAi": 1
     },
     {
@@ -269,8 +267,8 @@
         "ECOA-DISCOURAGE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 5975,
-      "costUsd": 0.0137104,
+      "latencyMs": 4738,
+      "costUsd": 0.0114304,
       "droppedAi": 0
     },
     {
@@ -285,8 +283,8 @@
         "UDAAP-APR"
       ],
       "mustNotFlag": [],
-      "latencyMs": 6715,
-      "costUsd": 0.0153314,
+      "latencyMs": 6572,
+      "costUsd": 0.0157514,
       "droppedAi": 0
     },
     {
@@ -301,8 +299,8 @@
         "FTC-AFFILIATE",
         "UDAAP-SUPERLATIVE"
       ],
-      "latencyMs": 7710,
-      "costUsd": 0.0175016,
+      "latencyMs": 7744,
+      "costUsd": 0.018141599999999997,
       "droppedAi": 0
     },
     {
@@ -318,8 +316,8 @@
         "REGZ-24-MORTGAGE"
       ],
       "mustNotFlag": [],
-      "latencyMs": 6120,
-      "costUsd": 0.013548600000000001,
+      "latencyMs": 7065,
+      "costUsd": 0.0165686,
       "droppedAi": 0
     },
     {
@@ -334,8 +332,8 @@
         "EMAIL-CANSPAM",
         "FCRA-PREQUAL"
       ],
-      "latencyMs": 6098,
-      "costUsd": 0.0136634,
+      "latencyMs": 5911,
+      "costUsd": 0.013323399999999999,
       "droppedAi": 0
     },
     {
@@ -349,8 +347,8 @@
         "UDAAP-APR"
       ],
       "mustNotFlag": [],
-      "latencyMs": 7974,
-      "costUsd": 0.0178314,
+      "latencyMs": 7144,
+      "costUsd": 0.0173314,
       "droppedAi": 0
     }
   ],
@@ -382,7 +380,7 @@
     },
     "REGZ-16-INTRO": {
       "tp": 1,
-      "fp": 1,
+      "fp": 0,
       "fn": 0
     },
     "REGZ-16-DEFERRED": {
@@ -392,7 +390,7 @@
     },
     "UDAAP-APR": {
       "tp": 1,
-      "fp": 3,
+      "fp": 2,
       "fn": 0
     },
     "UDAAP-GUARANTEE": {
@@ -463,8 +461,8 @@
   },
   "summary": {
     "TP": 27,
-    "FP": 7,
+    "FP": 5,
     "FN": 0,
-    "cost": 0.6342738
+    "cost": 0.35840259999999996
   }
 }

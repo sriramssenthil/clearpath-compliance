@@ -11,11 +11,12 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "seed": "tsx scripts/seed.ts",
     "eval": "tsx evals/run.ts",
     "seed:people": "tsx scripts/seed-people.ts",
     "seed:reference": "tsx scripts/seed-reference.ts",
-    "seed:history": "tsx scripts/seed-history.ts"
+    "seed:history": "tsx scripts/seed-history.ts",
+    "seed:all": "npm run seed:people && npm run seed:reference && npm run seed:history",
+    "test:smoke": "tsx scripts/smoke-workflow.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",
