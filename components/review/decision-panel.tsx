@@ -254,7 +254,7 @@ export function DecisionPanel(p: Props) {
                     p.onConfirmOpen?.();
                   }}
                 >
-                  {OUTCOME_VERB[o]}
+                  {o === "approved" && blocking.length ? "Approve with override..." : OUTCOME_VERB[o]}
                 </Button>
               );
             })}

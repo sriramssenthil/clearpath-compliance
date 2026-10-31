@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { HTMLAttributes, MouseEvent } from "react";
+import { useTransition, type HTMLAttributes, type MouseEvent } from "react";
 
 /**
  * A table row that opens `href` when clicked anywhere outside its own links and controls.
@@ -12,13 +12,14 @@ import type { HTMLAttributes, MouseEvent } from "react";
  */
 export function ClickableRow({ href, onClick, className, ...rest }: HTMLAttributes<HTMLTableRowElement> & { href: string }) {
   const router = useRouter();
+  const [pending, start] = useTransition();
   const handle = (e: MouseEvent<HTMLTableRowElement>) => {
     onClick?.(e);
     if (e.defaultPrevented || e.button !== 0) return;
     if ((e.target as HTMLElement).closest("a, button, input, select, textarea, label, summary, [role=button]")) return;
     if (window.getSelection()?.toString()) return; // the user was selecting text, not opening the row
     if (e.metaKey || e.ctrlKey) window.open(href, "_blank", "noopener");
-    else router.push(href);
+    else start(() => router.push(href));
   };
-  return <tr {...rest} onClick={handle} className={`cursor-pointer ${className ?? ""}`} />;
+  return <tr {...rest} onClick={handle} aria-busy={pending || undefined} className={`cursor-pointer ${pending ? "animate-pulse opacity-70" : ""} ${className ?? ""}`} />;
 }

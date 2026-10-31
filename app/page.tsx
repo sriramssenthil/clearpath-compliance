@@ -18,6 +18,7 @@ import { findUserByEmail, isDemoMode, switchPersona } from "@/lib/auth";
 import { PERSONAS, ROLES, type Role } from "@/lib/personas";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Wordmark } from "@/components/ui/wordmark";
+import { PendingSubmit } from "@/components/ui/pending-submit";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const REPO_URL = "https://github.com/sriramssenthil/clearpath-compliance";
@@ -78,10 +79,10 @@ function PersonaCard({ role, user }: { role: Role; user: { id: number; name: str
       <div className="px-5 pb-5">
         {user ? (
           <form action={switchPersona.bind(null, user.id)}>
-            <Button type="submit" variant={role === "affiliate" ? "primary" : "secondary"} className="w-full">
+            <PendingSubmit variant={role === "affiliate" ? "primary" : "secondary"} className="w-full" pendingLabel={`Opening as ${user.name}...`}>
               Explore as {user.name}
               <ArrowRight aria-hidden className="size-4" />
-            </Button>
+            </PendingSubmit>
           </form>
         ) : (
           <Button disabled variant="secondary" className="w-full">

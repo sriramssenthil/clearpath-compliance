@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, type ReactNode } from "react";
-import { RefreshCw, ScanSearch } from "lucide-react";
+import { ScanSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -119,10 +119,14 @@ export const AssetEditor = forwardRef<HTMLTextAreaElement, Props>(function Asset
           <p className={cn("text-xs", over ? "font-medium text-danger" : "text-muted")}>
             {value.length.toLocaleString("en-US")} / {MAX_CONTENT.toLocaleString("en-US")} characters, {wordCount(value).toLocaleString("en-US")} words
           </p>
-          <Button onClick={onRun} disabled={disabled || running || !canRun || over} variant={hasResult ? "secondary" : "primary"}>
-            {hasResult ? <RefreshCw aria-hidden className="size-4" /> : <ScanSearch aria-hidden className="size-4" />}
-            {running ? "Checking..." : hasResult ? "Re-run pre-check" : "Run pre-check"}
-          </Button>
+          {/* First run only. Afterwards Re-run lives in the sticky submit bar (always visible) and the results
+              panel; a copy here could slide under the sticky bar while scrolling. */}
+          {!hasResult || running ? (
+            <Button onClick={onRun} disabled={disabled || running || !canRun || over} variant="primary">
+              <ScanSearch aria-hidden className="size-4" />
+              {running ? "Checking..." : "Run pre-check"}
+            </Button>
+          ) : null}
         </div>
         {error ? (
           <p role="alert" className="text-sm text-danger">

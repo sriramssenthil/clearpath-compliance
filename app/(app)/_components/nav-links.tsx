@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LinkPending } from "@/components/ui/link-pending";
 import { FilePlus, FileText, LayoutDashboard, ListChecks, Scale, Users, type LucideIcon } from "lucide-react";
 import type { NavItem, NavKey } from "@/lib/personas";
 import { cn } from "@/lib/utils";
@@ -40,6 +41,7 @@ export function NavLinks({ items }: { items: NavItem[] }) {
               >
                 <Icon aria-hidden className="size-4" />
                 {item.label}
+                <LinkPending />
               </Link>
             </li>
           );
