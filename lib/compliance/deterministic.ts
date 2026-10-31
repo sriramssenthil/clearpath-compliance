@@ -158,6 +158,27 @@ const AS_LOW_AS = /(?:as low as|starting (?:at|from))\s*$/i;
 const NOT_A_RATE_AFTER =
   /^\s*(?:of\b|(?:cash\s*)?back\b|cash\b|rewards?\b|off\b|discount|bonus|APY\b|savings|down\b|fees?\b|origination|late\b|closing|points?\b|increase|decrease|more\b|less\b|higher|lower|faster)/i;
 const NOT_A_RATE_BEFORE = /\b(?:fees?|origination|down\s*payment|closing costs?|points?|discount|save|bonus)\s*(?:of|is|are|:|at)?\s*$/i;
+// What a percentage describes: the nearest subject before it in the same clause decides. "An origination
+// fee of 0% to 8% may apply and is included in the APR" is about a fee (both numbers), even though "APR"
+// follows, while "a 5% fee and rates from 4.99%" still makes 4.99% a rate claim.
+const NON_RATE_SUBJECT =
+  /\b(?:(?:origination|annual|late|balance[- ]transfer|transfer|closing|application|processing|prepayment)\s+)?fees?\b|\borigination\b|\bcash\s*back\b|\brewards?\b|\bdown\s*payments?\b|\bdiscounts?\b|\bAPY\b|\bpoints?\b|\bsavings?\b|\bbonus\b/gi;
+const RATE_SUBJECT = /\bAPRs?\b|\bannual percentage rates?\b|\brates?\b|\binterest\b/gi;
+
+function describesNonRate(content: string, start: number): boolean {
+  const from = Math.max(0, start - 120);
+  let clause = content.slice(from, start);
+  const cut = Math.max(clause.lastIndexOf(". "), clause.lastIndexOf("\n"), clause.lastIndexOf("; "));
+  if (cut >= 0) clause = clause.slice(cut + 1);
+  const last = (re: RegExp) => {
+    let idx = -1;
+    for (const m of clause.matchAll(re)) idx = m.index!;
+    return idx;
+  };
+  const nonRate = last(NON_RATE_SUBJECT);
+  return nonRate >= 0 && nonRate > last(RATE_SUBJECT);
+}
+
 const INTRO_APR_LABEL =
   /\bintro(?:ductory)?\b|\bpromo(?:tional)?\b|\blimited[- ]time\b|\bfor\s+(?:the\s+)?(?:first\s+)?\d+\s*(?:months?|years?|mos?)\b|\bfirst\s+\d+\s*(?:months?|years?)\b|\bbalance transfers?\b|\bnew purchases\b/i;
 const INTRO_LABEL =
@@ -231,7 +252,7 @@ function runNumeric(
       const end = start + m[0].length;
       const w = around(content, start, end, 40, false);
       const direct = APR_DIRECT.test(w.after);
-      const excluded = NOT_A_RATE_AFTER.test(w.after) || NOT_A_RATE_BEFORE.test(w.before);
+      const excluded = NOT_A_RATE_AFTER.test(w.after) || NOT_A_RATE_BEFORE.test(w.before) || describesNonRate(content, start);
       const claim =
         direct ||
         (!excluded &&

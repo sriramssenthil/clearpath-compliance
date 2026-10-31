@@ -344,3 +344,23 @@ describe("invariants", () => {
     }
   });
 });
+
+describe("regression: fee percentages are not APR claims", () => {
+  const aprRule = { ...rule("REGZ-24-AVAIL", { type: "numeric", check: "apr_below_floor", issue: "Below floor." }) };
+  const run = (text: string) => runDeterministic(ctx(text), [aprRule], loanFacts);
+
+  it("does not read a fee range followed by 'included in the APR' as an APR (QA report)", () => {
+    expect(run("APRs from 8.99% to 35.99% APR. An origination fee of 0% to 8% may apply and is included in the APR.")).toHaveLength(0);
+    expect(run("An origination fee of 0% to 8% may apply and is included in the APR.")).toHaveLength(0);
+  });
+  it("ignores other non-rate subjects even when APR or rate words are nearby", () => {
+    expect(run("Earn 1.5% cash back, and the APR is 8.99% to 35.99%.")).toHaveLength(0);
+    expect(run("A 3% balance transfer fee applies; see the APR for details.")).toHaveLength(0);
+    expect(run("Put 5% down payment toward a loan with a competitive rate.")).toHaveLength(0);
+  });
+  it("still flags real rate claims, including after a fee in the same sentence", () => {
+    expect(run("Rates from 4.99% APR.")).toHaveLength(1);
+    expect(run("A 5% fee applies and rates start from 4.99% APR.")).toHaveLength(1);
+    expect(run("APRs as low as 5.25%.")).toHaveLength(1);
+  });
+});

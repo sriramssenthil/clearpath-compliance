@@ -34,11 +34,18 @@ export interface AnalysisFile {
   sha256: string;
 }
 
+/**
+ * Bump when the deterministic checker's behaviour changes (lib/compliance/deterministic.ts, fix-text.ts,
+ * summary.ts), so cached analyses made with the old logic are not served again.
+ */
+const ENGINE_VERSION = "2026-10-30-fee-subject";
+
 function cacheKey(ctx: AssetContext, rules: RuleDef[], facts: unknown, file: AnalysisFile | null): string {
   const rulesFp = sha(JSON.stringify(rules.map((r) => [r.code, r.severity, r.enabled, r.aiReview, r.checkInstruction, r.config])));
   return sha(
     JSON.stringify([
       PROMPT_VERSION,
+      ENGINE_VERSION,
       process.env.ANTHROPIC_MODEL ?? DEFAULT_MODEL,
       process.env.ANTHROPIC_EFFORT ?? "low",
       rulesFp,
